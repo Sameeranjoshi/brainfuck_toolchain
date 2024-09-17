@@ -61,22 +61,27 @@ class Interpreter:
     
     def execute(self, instruction, PC_Index=None, filename=None):
         if instruction == '>':
+            print("Instruction '>' encountered")
             self.move_right()
             PC_Index += 1
             return PC_Index
         elif instruction == '<':
+            print("Instruction '<' encountered")
             self.move_left()
             PC_Index += 1
             return PC_Index
         elif instruction == '+':
+            print("Instruction '+' encountered")
             self.increment()
             PC_Index += 1
             return PC_Index
         elif instruction == '-':
+            print("Instruction '-' encountered")
             self.decrement()
             PC_Index += 1
             return PC_Index
         elif instruction == '.':    # output
+            print("Instruction '.' encountered")
             self.write()
             PC_Index += 1
             return PC_Index
@@ -84,6 +89,7 @@ class Interpreter:
         #     #self.replace(input_value)
         #     pass
         elif instruction == '[':
+            print("Instruction '[' encountered")
             if self.is_currentcell_zero():
                 temp_pc_index = PC_Index
                 while temp_pc_index < len(self._preprocessed):
@@ -95,6 +101,7 @@ class Interpreter:
                 PC_Index += 1
                 return PC_Index
         elif instruction == ']':
+            print("Instruction ']' encountered")
             if not self.is_currentcell_zero():
                 temp_pc_index = PC_Index
                 while temp_pc_index >= 0:
@@ -112,14 +119,14 @@ class Interpreter:
     
 
     def interpret(self, code, filename):
-        print("len before = ", len(code))
+
         # preprocess the input
         for eachword in code:
             if eachword not in ['>', '<', '+', '-', '.', ',', '[', ']']:
                 continue    # skip the invalid commands
             else:
                 self._preprocessed.append(eachword)
-        print("len = ", len(self._preprocessed))
+
         # do matching parenthesis using python regex library.
         if not check_balanced_parentheses(str(self._preprocessed)):
             print(f"Unbalanced parentheses in file={filename}")
@@ -132,6 +139,7 @@ class Interpreter:
             new_PC_index = self.execute(instruction=PC, PC_Index=PC_index, filename=filename)
             PC_index = new_PC_index
         print(f"\nSuccessfully interpreted code from file={filename}")
+
 
 
 def dbgs(object):
