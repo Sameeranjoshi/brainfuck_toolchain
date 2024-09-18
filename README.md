@@ -19,8 +19,8 @@ The Python interpreter is way slow! Switched to C++ then.
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/tavakkoliamirmohammad/brainfuck-cpp.git
-cd brainfuck-cpp
+git clone https://github.com/Sameeranjoshi/brainfuck_toolchain.git
+cd brainfuck_toolchain/
 ```
 
 ### 3. Build the Interpreter

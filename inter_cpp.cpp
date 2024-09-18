@@ -16,7 +16,7 @@ public:
     std::vector<std::string> input_files;
 
     Constants() {
-        std::string directory = "brainfuck-benchmark/benches/";
+        std::string directory = "benches/";
         for (const auto& entry : fs::directory_iterator(directory)) {
             if (entry.path().extension() == ".b") {
                 input_files.push_back(entry.path().string());
