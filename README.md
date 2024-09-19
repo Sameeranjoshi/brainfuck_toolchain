@@ -43,3 +43,10 @@ Run the interpreter: This runs all the benchmarks
 ./bfi
 ```
 ---
+
+Run the interpreter with profiling enabled:
+```bash
+./bfi -p
+```
+This generates a `profiling_output.txt` file in the current directory.
+

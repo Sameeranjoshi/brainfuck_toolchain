@@ -1,0 +1,1382 @@
+
+Profiling data for file=benches/bench.b
+
+Instruction count:
+.: 2
+[: 522251
+-: 133695590
+>: 522420
+]: 133173336
++: 256
+<: 522417
+
+Simple innermost loops profile data:
+Loop [20, 22] executed 132130800 times
+Loop [16, 24] executed 518160 times
+Loop [12, 26] executed 2032 times
+Loop [54, 62] executed 79 times
+Loop [8, 28] executed 7 times
+Loop [38, 52] executed 7 times
+
+Total simple loops: 6
+Total loops: 132651085
+Non simple loops: 132651079
+
+Profiling data for file=benches/bottles.b
+
+Instruction count:
+.: 11849
+[: 87690
++: 416627
+<: 293932
+>: 293932
+-: 421394
+]: 235928
+
+Simple innermost loops profile data:
+Loop [95, 100] executed 18600 times
+Loop [83, 93] executed 18600 times
+Loop [1849, 1859] executed 18240 times
+Loop [1861, 1866] executed 18240 times
+Loop [1043, 1045] executed 11272 times
+Loop [463, 465] executed 11272 times
+Loop [2231, 2233] executed 11272 times
+Loop [1799, 1801] executed 5103 times
+Loop [1795, 1797] executed 5103 times
+Loop [33, 35] executed 5047 times
+Loop [29, 31] executed 5047 times
+Loop [76, 127] executed 4851 times
+Loop [49, 56] executed 4851 times
+Loop [38, 46] executed 4851 times
+Loop [1842, 1893] executed 4753 times
+Loop [1815, 1822] executed 4753 times
+Loop [1804, 1812] executed 4753 times
+Loop [1988, 1990] executed 2813 times
+Loop [220, 222] executed 2566 times
+Loop [1787, 1789] executed 891 times
+Loop [1184, 1198] executed 891 times
+Loop [2626, 2628] executed 891 times
+Loop [631, 644] executed 792 times
+Loop [2399, 2412] executed 792 times
+Loop [2264, 2277] executed 792 times
+Loop [2592, 2606] executed 792 times
+Loop [824, 838] executed 792 times
+Loop [1592, 1605] executed 792 times
+Loop [496, 509] executed 792 times
+Loop [1076, 1089] executed 792 times
+Loop [1425, 1439] executed 693 times
+Loop [2456, 2470] executed 693 times
+Loop [1531, 1545] executed 693 times
+Loop [2529, 2544] executed 693 times
+Loop [1659, 1674] executed 693 times
+Loop [602, 616] executed 693 times
+Loop [1764, 1779] executed 693 times
+Loop [245, 263] executed 693 times
+Loop [2013, 2031] executed 693 times
+Loop [2370, 2384] executed 693 times
+Loop [2428, 2442] executed 693 times
+Loop [761, 776] executed 693 times
+Loop [1302, 1316] executed 693 times
+Loop [688, 702] executed 693 times
+Loop [660, 674] executed 693 times
+Loop [1340, 1354] executed 594 times
+Loop [2300, 2314] executed 594 times
+Loop [734, 748] executed 594 times
+Loop [1112, 1126] executed 594 times
+Loop [1618, 1632] executed 594 times
+Loop [2502, 2516] executed 594 times
+Loop [532, 546] executed 594 times
+Loop [1214, 1228] executed 594 times
+Loop [1503, 1517] executed 594 times
+Loop [1275, 1289] executed 594 times
+Loop [1366, 1380] executed 594 times
+Loop [556, 571] executed 495 times
+Loop [2324, 2339] executed 495 times
+Loop [1136, 1151] executed 495 times
+Loop [1687, 1704] executed 396 times
+Loop [944, 957] executed 396 times
+Loop [364, 377] executed 396 times
+Loop [1450, 1467] executed 396 times
+Loop [2132, 2145] executed 396 times
+Loop [194, 203] executed 360 times
+Loop [148, 160] executed 360 times
+Loop [1904, 1909] executed 360 times
+Loop [180, 190] executed 360 times
+Loop [1946, 1956] executed 352 times
+Loop [1960, 1969] executed 352 times
+Loop [1914, 1926] executed 352 times
+Loop [138, 143] executed 352 times
+Loop [921, 933] executed 297 times
+Loop [2239, 2251] executed 297 times
+Loop [2109, 2121] executed 297 times
+Loop [2089, 2101] executed 297 times
+Loop [901, 911] executed 297 times
+Loop [321, 333] executed 297 times
+Loop [341, 353] executed 297 times
+Loop [471, 483] executed 297 times
+Loop [1051, 1063] executed 297 times
+Loop [1711, 1721] executed 198 times
+Loop [1568, 1578] executed 198 times
+Loop [1552, 1561] executed 198 times
+Loop [2551, 2566] executed 99 times
+Loop [783, 798] executed 99 times
+Loop [10, 25] executed 8 times
+
+Total simple loops: 87
+Total loops: 197809
+Non simple loops: 197722
+
+Profiling data for file=benches/deadcodetest.b
+
+Instruction count:
+]: 2
+-: 2
+[: 3
++: 2
+
+Simple innermost loops profile data:
+Loop [17, 19] executed 1 times
+
+Total simple loops: 1
+Total loops: 1
+Non simple loops: 0
+
+Profiling data for file=benches/hanoi.b
+
+Instruction count:
+[: 44827165
+<: 130802086
++: 2096524055
+.: 19090
+>: 130802373
+-: 2096523648
+]: 2096777478
+
+Simple innermost loops profile data:
+Loop [48275, 48277] executed 2023560000 times
+Loop [48170, 48280] executed 20337800 times
+Loop [42219, 42228] executed 3036362 times
+Loop [41416, 41425] executed 3036362 times
+Loop [41430, 41439] executed 3036362 times
+Loop [42233, 42242] executed 3036362 times
+Loop [41399, 41408] executed 2149266 times
+Loop [41385, 41394] executed 2149266 times
+Loop [42188, 42197] executed 2149266 times
+Loop [42202, 42211] executed 2149266 times
+Loop [39195, 39206] executed 785302 times
+Loop [39178, 39189] executed 785302 times
+Loop [38823, 38834] executed 785302 times
+Loop [38806, 38817] executed 785302 times
+Loop [39228, 39237] executed 141438 times
+Loop [39214, 39223] executed 141438 times
+Loop [38856, 38865] executed 141438 times
+Loop [38842, 38851] executed 141438 times
+Loop [47965, 48283] executed 101689 times
+Loop [38731, 38742] executed 99736 times
+Loop [38714, 38725] executed 99736 times
+Loop [39086, 39097] executed 99736 times
+Loop [39103, 39114] executed 99736 times
+Loop [36206, 36217] executed 91404 times
+Loop [36223, 36234] executed 91404 times
+Loop [36578, 36589] executed 91404 times
+Loop [36595, 36606] executed 91404 times
+Loop [41346, 41355] executed 88914 times
+Loop [42149, 42158] executed 88914 times
+Loop [42135, 42144] executed 88914 times
+Loop [41940, 41942] executed 88914 times
+Loop [41332, 41341] executed 88914 times
+Loop [41284, 41286] executed 72562 times
+Loop [42707, 42709] executed 60809 times
+Loop [41975, 41993] executed 60298 times
+Loop [42104, 42113] executed 60298 times
+Loop [42118, 42127] executed 60298 times
+Loop [41950, 41967] executed 60298 times
+Loop [42171, 42255] executed 60298 times
+Loop [41368, 41452] executed 60298 times
+Loop [41315, 41324] executed 60298 times
+Loop [41147, 41164] executed 60298 times
+Loop [41172, 41190] executed 60298 times
+Loop [41301, 41310] executed 60298 times
+Loop [41137, 41139] executed 55524 times
+Loop [36242, 36251] executed 51788 times
+Loop [36256, 36265] executed 51788 times
+Loop [36614, 36623] executed 51788 times
+Loop [36628, 36637] executed 51788 times
+Loop [38556, 38558] executed 51136 times
+Loop [41291, 41293] executed 50600 times
+Loop [42513, 42515] executed 44457 times
+Loop [10735, 10744] executed 42183 times
+Loop [10749, 10758] executed 42183 times
+Loop [11502, 11511] executed 42183 times
+Loop [11516, 11525] executed 42183 times
+Loop [39589, 39591] executed 39648 times
+Loop [15838, 15849] executed 37360 times
+Loop [49817, 49828] executed 37360 times
+Loop [38638, 38652] executed 36828 times
+Loop [38619, 38632] executed 36828 times
+Loop [38587, 38603] executed 36828 times
+Loop [38985, 38998] executed 36828 times
+Loop [39004, 39018] executed 36828 times
+Loop [39037, 39039] executed 36828 times
+Loop [38565, 38580] executed 36828 times
+Loop [38764, 38773] executed 36522 times
+Loop [38750, 38759] executed 36522 times
+Loop [38694, 38702] executed 36522 times
+Loop [38681, 38688] executed 36522 times
+Loop [39053, 39060] executed 36522 times
+Loop [39136, 39145] executed 36522 times
+Loop [39122, 39131] executed 36522 times
+Loop [39066, 39074] executed 36522 times
+Loop [10704, 10713] executed 36507 times
+Loop [10718, 10727] executed 36507 times
+Loop [11471, 11480] executed 36507 times
+Loop [11485, 11494] executed 36507 times
+Loop [48172, 48174] executed 36281 times
+Loop [38786, 38878] executed 33792 times
+Loop [39158, 39250] executed 33792 times
+Loop [52848, 52857] executed 30158 times
+Loop [52834, 52843] executed 30158 times
+Loop [42302, 42307] executed 28105 times
+Loop [34513, 34515] executed 28105 times
+Loop [42294, 42299] executed 28105 times
+Loop [41491, 41496] executed 28105 times
+Loop [41499, 41504] executed 28105 times
+Loop [41725, 41727] executed 24869 times
+Loop [35304, 35311] executed 24869 times
+Loop [35314, 35326] executed 24869 times
+Loop [35275, 35280] executed 24528 times
+Loop [35282, 35294] executed 24528 times
+Loop [45196, 45198] executed 24528 times
+Loop [35484, 35486] executed 24528 times
+Loop [13250, 13252] executed 24480 times
+Loop [42610, 42612] executed 18594 times
+Loop [33923, 33925] executed 18234 times
+Loop [36094, 36102] executed 17406 times
+Loop [36466, 36474] executed 17406 times
+Loop [36522, 36531] executed 17406 times
+Loop [36536, 36545] executed 17406 times
+Loop [36453, 36460] executed 17406 times
+Loop [36150, 36159] executed 17406 times
+Loop [36081, 36088] executed 17406 times
+Loop [36164, 36173] executed 17406 times
+Loop [36114, 36125] executed 16860 times
+Loop [36131, 36142] executed 16860 times
+Loop [36503, 36514] executed 16860 times
+Loop [36486, 36497] executed 16860 times
+Loop [34373, 34375] executed 15841 times
+Loop [39560, 39569] executed 13846 times
+Loop [39912, 39921] executed 13846 times
+Loop [39926, 39935] executed 13846 times
+Loop [39546, 39555] executed 13846 times
+Loop [36385, 36398] executed 13160 times
+Loop [35989, 36003] executed 13160 times
+Loop [36404, 36418] executed 13160 times
+Loop [36437, 36439] executed 13160 times
+Loop [36038, 36052] executed 13160 times
+Loop [35970, 35983] executed 13160 times
+Loop [36019, 36032] executed 13160 times
+Loop [36558, 36650] executed 12248 times
+Loop [36186, 36278] executed 12248 times
+Loop [52817, 52826] executed 10602 times
+Loop [52803, 52812] executed 10602 times
+Loop [38977, 38979] executed 9198 times
+Loop [38920, 38929] executed 9198 times
+Loop [37413, 37415] executed 9198 times
+Loop [40013, 40015] executed 9198 times
+Loop [37767, 37769] executed 9198 times
+Loop [38113, 38115] executed 9198 times
+Loop [36377, 36379] executed 9198 times
+Loop [38933, 38951] executed 9198 times
+Loop [37075, 37077] executed 9198 times
+Loop [39315, 39317] executed 9198 times
+Loop [39675, 39677] executed 9198 times
+Loop [36715, 36717] executed 9198 times
+Loop [40367, 40369] executed 9198 times
+Loop [40713, 40715] executed 9198 times
+Loop [39764, 39772] executed 9108 times
+Loop [39635, 39651] executed 9108 times
+Loop [39751, 39758] executed 9108 times
+Loop [39820, 39829] executed 9108 times
+Loop [39622, 39631] executed 9108 times
+Loop [39468, 39477] executed 9108 times
+Loop [39454, 39463] executed 9108 times
+Loop [39834, 39843] executed 9108 times
+Loop [39385, 39392] executed 9108 times
+Loop [39398, 39406] executed 9108 times
+Loop [53128, 53137] executed 8394 times
+Loop [53142, 53151] executed 8394 times
+Loop [53159, 53168] executed 8320 times
+Loop [53173, 53182] executed 8320 times
+Loop [36333, 36351] executed 7434 times
+Loop [36320, 36329] executed 7434 times
+Loop [36868, 36877] executed 7380 times
+Loop [37220, 37229] executed 7380 times
+Loop [37035, 37051] executed 7380 times
+Loop [37151, 37158] executed 7380 times
+Loop [37164, 37172] executed 7380 times
+Loop [37234, 37243] executed 7380 times
+Loop [36854, 36863] executed 7380 times
+Loop [37022, 37031] executed 7380 times
+Loop [36798, 36806] executed 7380 times
+Loop [36785, 36792] executed 7380 times
+Loop [33947, 33949] executed 6580 times
+Loop [42614, 42616] executed 6580 times
+Loop [37370, 37377] executed 6272 times
+Loop [37359, 37366] executed 6272 times
+Loop [37469, 37471] executed 6272 times
+Loop [37001, 37006] executed 6272 times
+Loop [37009, 37014] executed 6272 times
+Loop [37054, 37065] executed 6272 times
+Loop [52764, 52773] executed 6248 times
+Loop [52636, 52661] executed 6248 times
+Loop [52673, 52699] executed 6248 times
+Loop [49792, 49802] executed 6248 times
+Loop [52750, 52759] executed 6248 times
+Loop [49805, 49812] executed 6248 times
+Loop [14622, 14629] executed 6248 times
+Loop [14632, 15076] executed 6248 times
+Loop [49838, 50251] executed 6248 times
+Loop [15877, 15886] executed 6248 times
+Loop [15871, 15873] executed 6096 times
+Loop [40069, 40071] executed 6072 times
+Loop [39970, 39977] executed 6072 times
+Loop [39654, 39665] executed 6072 times
+Loop [39601, 39606] executed 6072 times
+Loop [39609, 39614] executed 6072 times
+Loop [39959, 39966] executed 6072 times
+Loop [51073, 51084] executed 5616 times
+Loop [49773, 49784] executed 5616 times
+Loop [15852, 15863] executed 5616 times
+Loop [17205, 17216] executed 5616 times
+Loop [52139, 52150] executed 5616 times
+Loop [18314, 18325] executed 5616 times
+Loop [42790, 42799] executed 4599 times
+Loop [45322, 45330] executed 4599 times
+Loop [46641, 46643] executed 4599 times
+Loop [46995, 46997] executed 4599 times
+Loop [47341, 47343] executed 4599 times
+Loop [48401, 48410] executed 4599 times
+Loop [42503, 42505] executed 4599 times
+Loop [46303, 46305] executed 4599 times
+Loop [48415, 48424] executed 4599 times
+Loop [43093, 43100] executed 4599 times
+Loop [43017, 43019] executed 4599 times
+Loop [42804, 42813] executed 4599 times
+Loop [42973, 42991] executed 4599 times
+Loop [42960, 42969] executed 4599 times
+Loop [42721, 42728] executed 4599 times
+Loop [42734, 42742] executed 4599 times
+Loop [45561, 45579] executed 4599 times
+Loop [45309, 45316] executed 4599 times
+Loop [45378, 45387] executed 4599 times
+Loop [44753, 44755] executed 4599 times
+Loop [44407, 44409] executed 4599 times
+Loop [44053, 44055] executed 4599 times
+Loop [43715, 43717] executed 4599 times
+Loop [45392, 45401] executed 4599 times
+Loop [43355, 43357] executed 4599 times
+Loop [45548, 45557] executed 4599 times
+Loop [45605, 45607] executed 4599 times
+Loop [43176, 43185] executed 4599 times
+Loop [45681, 45688] executed 4599 times
+Loop [45694, 45702] executed 4599 times
+Loop [43162, 43171] executed 4599 times
+Loop [43106, 43114] executed 4599 times
+Loop [45750, 45759] executed 4599 times
+Loop [45764, 45773] executed 4599 times
+Loop [45943, 45945] executed 4599 times
+Loop [36299, 36304] executed 4332 times
+Loop [36307, 36312] executed 4332 times
+Loop [36354, 36367] executed 4332 times
+Loop [36661, 36668] executed 4332 times
+Loop [36771, 36773] executed 4332 times
+Loop [36672, 36679] executed 4332 times
+Loop [45889, 45896] executed 4088 times
+Loop [42994, 43007] executed 4088 times
+Loop [42947, 42952] executed 4088 times
+Loop [42939, 42944] executed 4088 times
+Loop [45999, 46001] executed 4088 times
+Loop [45900, 45907] executed 4088 times
+Loop [45582, 45595] executed 4088 times
+Loop [45535, 45540] executed 4088 times
+Loop [45527, 45532] executed 4088 times
+Loop [43411, 43413] executed 4088 times
+Loop [43312, 43319] executed 4088 times
+Loop [43301, 43308] executed 4088 times
+Loop [53058, 53067] executed 3682 times
+Loop [53044, 53053] executed 3682 times
+Loop [52719, 52728] executed 3570 times
+Loop [52733, 52742] executed 3570 times
+Loop [52786, 52870] executed 3192 times
+Loop [18812, 18814] executed 3124 times
+Loop [18523, 18525] executed 3124 times
+Loop [48611, 48618] executed 3076 times
+Loop [18300, 18311] executed 3076 times
+Loop [48600, 48607] executed 3076 times
+Loop [52183, 52194] executed 3076 times
+Loop [39044, 39310] executed 3036 times
+Loop [38672, 38882] executed 3036 times
+Loop [52943, 52945] executed 3010 times
+Loop [48499, 48508] executed 2813 times
+Loop [48485, 48494] executed 2813 times
+Loop [52883, 52888] executed 2708 times
+Loop [52875, 52880] executed 2708 times
+Loop [51679, 51700] executed 2568 times
+Loop [51710, 51982] executed 2568 times
+Loop [49073, 49094] executed 2568 times
+Loop [50524, 50876] executed 2568 times
+Loop [15096, 15131] executed 2568 times
+Loop [17850, 18136] executed 2568 times
+Loop [15148, 15594] executed 2568 times
+Loop [16621, 16987] executed 2568 times
+Loop [50493, 50514] executed 2568 times
+Loop [17798, 17833] executed 2568 times
+Loop [16569, 16604] executed 2568 times
+Loop [49104, 49536] executed 2568 times
+Loop [35844, 35860] executed 2504 times
+Loop [35822, 35837] executed 2504 times
+Loop [52961, 52986] executed 2484 times
+Loop [53089, 53098] executed 2484 times
+Loop [53075, 53084] executed 2484 times
+Loop [52998, 53024] executed 2484 times
+Loop [39527, 39538] executed 2346 times
+Loop [39876, 39887] executed 2346 times
+Loop [39893, 39904] executed 2346 times
+Loop [39510, 39521] executed 2346 times
+Loop [37312, 37321] executed 2304 times
+Loop [36960, 36969] executed 2304 times
+Loop [37326, 37335] executed 2304 times
+Loop [36946, 36955] executed 2304 times
+Loop [17191, 17202] executed 2088 times
+Loop [51117, 51128] executed 2088 times
+Loop [48384, 48393] executed 2046 times
+Loop [48370, 48379] executed 2046 times
+Loop [48330, 48344] executed 2046 times
+Loop [48311, 48324] executed 2046 times
+Loop [48437, 48521] executed 2046 times
+Loop [39801, 39812] executed 2024 times
+Loop [39490, 39582] executed 2024 times
+Loop [39435, 39446] executed 2024 times
+Loop [39418, 39429] executed 2024 times
+Loop [39702, 39716] executed 2024 times
+Loop [39342, 39356] executed 2024 times
+Loop [39323, 39336] executed 2024 times
+Loop [39735, 39737] executed 2024 times
+Loop [39683, 39696] executed 2024 times
+Loop [40895, 40906] executed 2024 times
+Loop [39784, 39795] executed 2024 times
+Loop [40918, 40929] executed 2024 times
+Loop [39856, 39948] executed 2024 times
+Loop [53111, 53195] executed 2004 times
+Loop [48360, 48362] executed 1762 times
+Loop [39272, 39279] executed 1708 times
+Loop [39261, 39268] executed 1708 times
+Loop [39371, 39373] executed 1708 times
+Loop [38954, 38967] executed 1708 times
+Loop [38907, 38912] executed 1708 times
+Loop [38899, 38904] executed 1708 times
+Loop [8125, 8136] executed 1618 times
+Loop [8142, 8153] executed 1618 times
+Loop [8514, 8525] executed 1618 times
+Loop [8497, 8508] executed 1618 times
+Loop [53230, 53232] executed 1546 times
+Loop [12894, 12903] executed 1533 times
+Loop [12880, 12889] executed 1533 times
+Loop [13608, 13617] executed 1530 times
+Loop [51660, 51662] executed 1530 times
+Loop [13594, 13603] executed 1530 times
+Loop [53254, 53279] executed 1514 times
+Loop [53291, 53317] executed 1514 times
+Loop [53368, 53377] executed 1514 times
+Loop [53382, 53391] executed 1514 times
+Loop [48454, 48463] executed 1279 times
+Loop [48468, 48477] executed 1279 times
+Loop [48569, 48574] executed 1276 times
+Loop [48561, 48566] executed 1276 times
+Loop [12964, 12973] executed 1275 times
+Loop [12978, 12987] executed 1275 times
+Loop [42508, 42510] executed 1252 times
+Loop [34101, 34120] executed 1252 times
+Loop [34323, 34340] executed 1252 times
+Loop [48364, 48366] executed 1252 times
+Loop [34351, 34369] executed 1252 times
+Loop [34344, 34346] executed 1252 times
+Loop [34132, 34152] executed 1252 times
+Loop [11223, 11225] executed 1197 times
+Loop [53452, 53461] executed 1120 times
+Loop [53466, 53475] executed 1120 times
+Loop [3850, 3852] executed 1078 times
+Loop [10665, 10674] executed 1044 times
+Loop [11418, 11427] executed 1044 times
+Loop [11432, 11441] executed 1044 times
+Loop [10651, 10660] executed 1044 times
+Loop [19225, 19234] executed 1023 times
+Loop [19211, 19220] executed 1023 times
+Loop [19194, 19203] executed 1023 times
+Loop [19180, 19189] executed 1023 times
+Loop [19139, 19155] executed 1023 times
+Loop [19117, 19132] executed 1023 times
+Loop [12790, 12803] executed 1020 times
+Loop [12916, 13000] executed 1020 times
+Loop [12863, 12872] executed 1020 times
+Loop [12849, 12858] executed 1020 times
+Loop [12809, 12823] executed 1020 times
+Loop [41823, 41848] executed 1004 times
+Loop [35456, 35482] executed 1004 times
+Loop [35341, 35366] executed 1004 times
+Loop [35378, 35404] executed 1004 times
+Loop [35419, 35444] executed 1004 times
+Loop [41895, 41902] executed 1004 times
+Loop [41906, 41913] executed 1004 times
+Loop [41690, 41715] executed 1004 times
+Loop [41863, 41889] executed 1004 times
+Loop [41730, 41756] executed 1004 times
+Loop [41762, 41769] executed 1004 times
+Loop [41773, 41780] executed 1004 times
+Loop [11258, 11276] executed 915 times
+Loop [11233, 11250] executed 915 times
+Loop [11387, 11396] executed 915 times
+Loop [11401, 11410] executed 915 times
+Loop [11454, 11538] executed 915 times
+Loop [10687, 10771] executed 915 times
+Loop [10634, 10643] executed 915 times
+Loop [10620, 10629] executed 915 times
+Loop [10491, 10509] executed 915 times
+Loop [10466, 10483] executed 915 times
+Loop [36444, 36710] executed 912 times
+Loop [36072, 36282] executed 912 times
+Loop [10603, 10605] executed 852 times
+Loop [53549, 53551] executed 834 times
+Loop [12438, 12440] executed 827 times
+Loop [53493, 53498] executed 780 times
+Loop [53501, 53506] executed 780 times
+Loop [19104, 19106] executed 768 times
+Loop [19247, 19331] executed 767 times
+Loop [12933, 12942] executed 765 times
+Loop [13479, 13502] executed 765 times
+Loop [13239, 13248] executed 765 times
+Loop [13225, 13234] executed 765 times
+Loop [13177, 13201] executed 765 times
+Loop [13143, 13166] executed 765 times
+Loop [13113, 13115] executed 765 times
+Loop [12947, 12956] executed 765 times
+Loop [13630, 13714] executed 765 times
+Loop [13577, 13586] executed 765 times
+Loop [13563, 13572] executed 765 times
+Loop [13513, 13537] executed 765 times
+Loop [13078, 13091] executed 741 times
+Loop [13098, 13111] executed 741 times
+Loop [5914, 5925] executed 691 times
+Loop [5897, 5908] executed 691 times
+Loop [5542, 5553] executed 691 times
+Loop [5525, 5536] executed 691 times
+Loop [35623, 35632] executed 681 times
+Loop [35609, 35618] executed 681 times
+Loop [8547, 8556] executed 661 times
+Loop [8533, 8542] executed 661 times
+Loop [8175, 8184] executed 661 times
+Loop [8161, 8170] executed 661 times
+Loop [10456, 10458] executed 622 times
+Loop [7875, 7877] executed 617 times
+Loop [5561, 5570] executed 534 times
+Loop [5947, 5956] executed 534 times
+Loop [5575, 5584] executed 534 times
+Loop [5933, 5942] executed 534 times
+Loop [13692, 13701] executed 510 times
+Loop [52204, 52465] executed 510 times
+Loop [52171, 52178] executed 510 times
+Loop [52158, 52168] executed 510 times
+Loop [53664, 53673] executed 510 times
+Loop [53650, 53659] executed 510 times
+Loop [19378, 19383] executed 510 times
+Loop [19370, 19375] executed 510 times
+Loop [53351, 53360] executed 510 times
+Loop [19085, 19087] executed 510 times
+Loop [53337, 53346] executed 510 times
+Loop [18339, 18348] executed 510 times
+Loop [17494, 17778] executed 510 times
+Loop [17457, 17482] executed 510 times
+Loop [13678, 13687] executed 510 times
+Loop [53695, 53704] executed 502 times
+Loop [53567, 53592] executed 502 times
+Loop [53604, 53630] executed 502 times
+Loop [53681, 53690] executed 502 times
+Loop [48303, 48305] executed 502 times
+Loop [17230, 17239] executed 494 times
+Loop [51092, 51102] executed 494 times
+Loop [51105, 51112] executed 494 times
+Loop [16145, 16172] executed 494 times
+Loop [16185, 16549] executed 494 times
+Loop [18333, 18335] executed 494 times
+Loop [51138, 51477] executed 494 times
+Loop [17224, 17226] executed 466 times
+Loop [33715, 33913] executed 454 times
+Loop [33417, 33614] executed 454 times
+Loop [19996, 20112] executed 454 times
+Loop [19821, 19936] executed 454 times
+Loop [31497, 31612] executed 418 times
+Loop [31672, 31788] executed 418 times
+Loop [21765, 21962] executed 418 times
+Loop [22063, 22261] executed 418 times
+Loop [53404, 53488] executed 394 times
+Loop [20608, 20887] executed 380 times
+Loop [21029, 21309] executed 380 times
+Loop [32693, 32973] executed 380 times
+Loop [32272, 32551] executed 380 times
+Loop [23173, 23184] executed 366 times
+Loop [30904, 30915] executed 366 times
+Loop [29782, 29791] executed 345 times
+Loop [29768, 29777] executed 345 times
+Loop [33126, 33135] executed 345 times
+Loop [33140, 33149] executed 345 times
+Loop [35776, 35781] executed 341 times
+Loop [35500, 35521] executed 341 times
+Loop [34758, 34765] executed 341 times
+Loop [34769, 34776] executed 341 times
+Loop [34837, 34839] executed 341 times
+Loop [34853, 34874] executed 341 times
+Loop [34884, 34906] executed 341 times
+Loop [34930, 34939] executed 341 times
+Loop [34944, 34953] executed 341 times
+Loop [35183, 35202] executed 341 times
+Loop [35211, 35231] executed 341 times
+Loop [35268, 35298] executed 341 times
+Loop [35962, 35964] executed 341 times
+Loop [35768, 35773] executed 341 times
+Loop [34615, 34624] executed 341 times
+Loop [34601, 34610] executed 341 times
+Loop [35531, 35553] executed 341 times
+Loop [35645, 35729] executed 341 times
+Loop [35578, 35587] executed 341 times
+Loop [35592, 35601] executed 341 times
+Loop [34525, 34546] executed 341 times
+Loop [34556, 34578] executed 341 times
+Loop [10610, 10612] executed 340 times
+Loop [8908, 8910] executed 337 times
+Loop [21488, 21497] executed 336 times
+Loop [21474, 21483] executed 336 times
+Loop [25355, 25364] executed 336 times
+Loop [25369, 25378] executed 336 times
+Loop [53200, 53205] executed 302 times
+Loop [53208, 53213] executed 302 times
+Loop [22973, 23089] executed 295 times
+Loop [22801, 22916] executed 295 times
+Loop [30625, 30823] executed 295 times
+Loop [30330, 30527] executed 295 times
+Loop [23129, 23140] executed 291 times
+Loop [30918, 30929] executed 291 times
+Loop [4785, 4787] executed 288 times
+Loop [36835, 36846] executed 288 times
+Loop [37184, 37195] executed 288 times
+Loop [36890, 36982] executed 288 times
+Loop [36742, 36756] executed 288 times
+Loop [36723, 36736] executed 288 times
+Loop [37201, 37212] executed 288 times
+Loop [37083, 37096] executed 288 times
+Loop [38318, 38329] executed 288 times
+Loop [38295, 38306] executed 288 times
+Loop [37256, 37348] executed 288 times
+Loop [37135, 37137] executed 288 times
+Loop [37102, 37116] executed 288 times
+Loop [36818, 36829] executed 288 times
+Loop [26473, 26484] executed 282 times
+Loop [27492, 27503] executed 282 times
+Loop [53717, 53801] executed 278 times
+Loop [29382, 29393] executed 268 times
+Loop [24884, 24895] executed 268 times
+Loop [27336, 27452] executed 267 times
+Loop [27164, 27279] executed 267 times
+Loop [26150, 26348] executed 267 times
+Loop [25855, 26052] executed 267 times
+Loop [8405, 8416] executed 258 times
+Loop [8422, 8433] executed 258 times
+Loop [8050, 8061] executed 258 times
+Loop [8033, 8044] executed 258 times
+Loop [13040, 13045] executed 257 times
+Loop [13048, 13053] executed 257 times
+Loop [19264, 19273] executed 256 times
+Loop [19278, 19287] executed 256 times
+Loop [13393, 13400] executed 255 times
+Loop [13753, 13758] executed 255 times
+Loop [13901, 13903] executed 255 times
+Loop [13661, 13670] executed 255 times
+Loop [13647, 13656] executed 255 times
+Loop [13462, 13464] executed 255 times
+Loop [13382, 13389] executed 255 times
+Loop [13323, 13332] executed 255 times
+Loop [13309, 13318] executed 255 times
+Loop [13761, 13766] executed 255 times
+Loop [50473, 50475] executed 240 times
+Loop [12630, 12639] executed 240 times
+Loop [12644, 12653] executed 240 times
+Loop [27506, 27517] executed 235 times
+Loop [26429, 26440] executed 235 times
+Loop [24438, 24718] executed 225 times
+Loop [24020, 24299] executed 225 times
+Loop [28562, 28841] executed 225 times
+Loop [28980, 29260] executed 225 times
+Loop [53765, 53774] executed 224 times
+Loop [53779, 53788] executed 224 times
+Loop [8013, 8021] executed 207 times
+Loop [8000, 8007] executed 207 times
+Loop [8372, 8379] executed 207 times
+Loop [8083, 8092] executed 207 times
+Loop [8069, 8078] executed 207 times
+Loop [8385, 8393] executed 207 times
+Loop [8441, 8450] executed 207 times
+Loop [8455, 8464] executed 207 times
+Loop [30111, 30229] executed 186 times
+Loop [30092, 30105] executed 186 times
+Loop [30943, 30952] executed 186 times
+Loop [23148, 23158] executed 186 times
+Loop [23161, 23168] executed 186 times
+Loop [23194, 23219] executed 186 times
+Loop [29396, 29407] executed 185 times
+Loop [24840, 24851] executed 185 times
+Loop [27525, 27527] executed 182 times
+Loop [52903, 53228] executed 178 times
+Loop [14073, 14102] executed 178 times
+Loop [14119, 14149] executed 178 times
+Loop [12782, 12784] executed 178 times
+Loop [14151, 14164] executed 178 times
+Loop [27667, 27696] executed 175 times
+Loop [26680, 26709] executed 175 times
+Loop [27647, 27649] executed 175 times
+Loop [27710, 27740] executed 175 times
+Loop [27764, 27773] executed 175 times
+Loop [27778, 27787] executed 175 times
+Loop [26944, 26951] executed 175 times
+Loop [26933, 26940] executed 175 times
+Loop [26790, 26799] executed 175 times
+Loop [26776, 26785] executed 175 times
+Loop [26723, 26753] executed 175 times
+Loop [34276, 34312] executed 175 times
+Loop [26664, 26666] executed 175 times
+Loop [25522, 25527] executed 175 times
+Loop [25514, 25519] executed 175 times
+Loop [42489, 42491] executed 175 times
+Loop [22269, 22271] executed 175 times
+Loop [21641, 21646] executed 175 times
+Loop [21633, 21638] executed 175 times
+Loop [34221, 34256] executed 175 times
+Loop [33162, 33246] executed 175 times
+Loop [33109, 33118] executed 175 times
+Loop [33095, 33104] executed 175 times
+Loop [33040, 33070] executed 175 times
+Loop [32997, 33026] executed 175 times
+Loop [31923, 31932] executed 175 times
+Loop [31909, 31918] executed 175 times
+Loop [31855, 31885] executed 175 times
+Loop [31812, 31841] executed 175 times
+Loop [31792, 31794] executed 175 times
+Loop [31384, 31391] executed 175 times
+Loop [31373, 31380] executed 175 times
+Loop [31230, 31239] executed 175 times
+Loop [31163, 31193] executed 175 times
+Loop [29639, 29668] executed 175 times
+Loop [29682, 29712] executed 175 times
+Loop [29737, 29746] executed 175 times
+Loop [29751, 29760] executed 175 times
+Loop [29804, 29888] executed 175 times
+Loop [31120, 31149] executed 175 times
+Loop [31216, 31225] executed 175 times
+Loop [52596, 52598] executed 174 times
+Loop [5855, 5864] executed 171 times
+Loop [5841, 5850] executed 171 times
+Loop [5785, 5793] executed 171 times
+Loop [5772, 5779] executed 171 times
+Loop [5400, 5407] executed 171 times
+Loop [5413, 5421] executed 171 times
+Loop [5469, 5478] executed 171 times
+Loop [5483, 5492] executed 171 times
+Loop [52592, 52594] executed 170 times
+Loop [53521, 53834] executed 170 times
+Loop [14048, 14055] executed 170 times
+Loop [14014, 14046] executed 170 times
+Loop [13965, 13996] executed 170 times
+Loop [20116, 20118] executed 166 times
+Loop [21335, 21368] executed 166 times
+Loop [20259, 20268] executed 166 times
+Loop [20245, 20254] executed 166 times
+Loop [34268, 34270] executed 166 times
+Loop [49050, 49052] executed 166 times
+Loop [20187, 20221] executed 166 times
+Loop [20138, 20171] executed 166 times
+Loop [19434, 19467] executed 166 times
+Loop [19708, 19715] executed 166 times
+Loop [19697, 19704] executed 166 times
+Loop [19554, 19563] executed 166 times
+Loop [19540, 19549] executed 166 times
+Loop [19483, 19517] executed 166 times
+Loop [25391, 25475] executed 166 times
+Loop [24905, 25094] executed 166 times
+Loop [25216, 25249] executed 166 times
+Loop [25265, 25299] executed 166 times
+Loop [34049, 34089] executed 166 times
+Loop [25324, 25333] executed 166 times
+Loop [33988, 34027] executed 166 times
+Loop [33293, 33298] executed 166 times
+Loop [25338, 25347] executed 166 times
+Loop [21443, 21452] executed 166 times
+Loop [33285, 33290] executed 166 times
+Loop [31104, 31106] executed 166 times
+Loop [29935, 29940] executed 166 times
+Loop [29927, 29932] executed 166 times
+Loop [29421, 29430] executed 166 times
+Loop [28220, 28420] executed 166 times
+Loop [28201, 28214] executed 166 times
+Loop [21384, 21418] executed 166 times
+Loop [24859, 24869] executed 166 times
+Loop [21457, 21466] executed 166 times
+Loop [21510, 21594] executed 166 times
+Loop [22287, 22320] executed 166 times
+Loop [22336, 22370] executed 166 times
+Loop [22393, 22402] executed 166 times
+Loop [22407, 22416] executed 166 times
+Loop [22550, 22557] executed 166 times
+Loop [22561, 22568] executed 166 times
+Loop [23237, 23239] executed 166 times
+Loop [23308, 23342] executed 166 times
+Loop [34156, 34158] executed 166 times
+Loop [23366, 23375] executed 166 times
+Loop [23259, 23292] executed 166 times
+Loop [24872, 24879] executed 166 times
+Loop [23380, 23389] executed 166 times
+Loop [13853, 13886] executed 162 times
+Loop [13905, 13939] executed 162 times
+Loop [13941, 13946] executed 162 times
+Loop [29415, 29417] executed 162 times
+Loop [8356, 8358] executed 156 times
+Loop [8323, 8337] executed 156 times
+Loop [8304, 8317] executed 156 times
+Loop [7957, 7971] executed 156 times
+Loop [7938, 7951] executed 156 times
+Loop [7906, 7922] executed 156 times
+Loop [7884, 7899] executed 156 times
+Loop [26461, 26468] executed 150 times
+Loop [27049, 27062] executed 150 times
+Loop [30937, 30939] executed 150 times
+Loop [26448, 26458] executed 150 times
+Loop [27531, 27540] executed 150 times
+Loop [27068, 27104] executed 150 times
+Loop [26494, 26601] executed 150 times
+Loop [5450, 5461] executed 146 times
+Loop [5433, 5444] executed 146 times
+Loop [5805, 5816] executed 146 times
+Loop [5822, 5833] executed 146 times
+Loop [8105, 8197] executed 145 times
+Loop [8477, 8569] executed 145 times
+Loop [11585, 11590] executed 126 times
+Loop [10810, 10815] executed 126 times
+Loop [11577, 11582] executed 126 times
+Loop [10818, 10823] executed 126 times
+Loop [5723, 5737] executed 121 times
+Loop [5289, 5302] executed 121 times
+Loop [5308, 5322] executed 121 times
+Loop [5338, 5351] executed 121 times
+Loop [5357, 5371] executed 121 times
+Loop [5704, 5717] executed 121 times
+Loop [5756, 5758] executed 121 times
+Loop [12613, 12622] executed 120 times
+Loop [12599, 12608] executed 120 times
+Loop [12843, 12845] executed 119 times
+Loop [5877, 5969] executed 114 times
+Loop [5505, 5597] executed 114 times
+Loop [6394, 6396] executed 108 times
+Loop [7432, 7434] executed 108 times
+Loop [6034, 6036] executed 108 times
+Loop [10032, 10034] executed 108 times
+Loop [8296, 8298] executed 108 times
+Loop [8252, 8270] executed 108 times
+Loop [5696, 5698] executed 108 times
+Loop [6732, 6734] executed 108 times
+Loop [9686, 9688] executed 108 times
+Loop [7086, 7088] executed 108 times
+Loop [8239, 8248] executed 108 times
+Loop [8634, 8636] executed 108 times
+Loop [8994, 8996] executed 108 times
+Loop [9332, 9334] executed 108 times
+Loop [1640, 1642] executed 106 times
+Loop [5639, 5648] executed 99 times
+Loop [5652, 5670] executed 99 times
+Loop [11773, 11775] executed 92 times
+Loop [12546, 12555] executed 90 times
+Loop [12560, 12569] executed 90 times
+Loop [18727, 18729] executed 89 times
+Loop [18624, 18649] executed 89 times
+Loop [18666, 18694] executed 89 times
+Loop [18860, 18862] executed 86 times
+Loop [18705, 18722] executed 85 times
+Loop [19042, 19072] executed 85 times
+Loop [18538, 18565] executed 85 times
+Loop [18581, 18609] executed 85 times
+Loop [18651, 18653] executed 85 times
+Loop [18741, 18767] executed 85 times
+Loop [18827, 18854] executed 85 times
+Loop [18870, 18898] executed 85 times
+Loop [18946, 18948] executed 85 times
+Loop [19002, 19019] executed 85 times
+Loop [18571, 18573] executed 84 times
+Loop [12222, 12233] executed 84 times
+Loop [19026, 19028] executed 81 times
+Loop [18915, 18944] executed 81 times
+Loop [18961, 18991] executed 81 times
+Loop [11032, 11034] executed 73 times
+Loop [4651, 4663] executed 73 times
+Loop [4641, 4648] executed 73 times
+Loop [551, 553] executed 73 times
+Loop [4612, 4617] executed 72 times
+Loop [11843, 11845] executed 72 times
+Loop [4619, 4631] executed 72 times
+Loop [3767, 3769] executed 64 times
+Loop [9153, 9162] executed 63 times
+Loop [8787, 8796] executed 63 times
+Loop [6187, 6196] executed 63 times
+Loop [6341, 6350] executed 63 times
+Loop [6354, 6370] executed 63 times
+Loop [6470, 6477] executed 63 times
+Loop [6483, 6491] executed 63 times
+Loop [6539, 6548] executed 63 times
+Loop [8941, 8950] executed 63 times
+Loop [6553, 6562] executed 63 times
+Loop [8717, 8725] executed 63 times
+Loop [9139, 9148] executed 63 times
+Loop [8773, 8782] executed 63 times
+Loop [8954, 8970] executed 63 times
+Loop [9083, 9091] executed 63 times
+Loop [9070, 9077] executed 63 times
+Loop [8704, 8711] executed 63 times
+Loop [6104, 6111] executed 63 times
+Loop [6117, 6125] executed 63 times
+Loop [6173, 6182] executed 63 times
+Loop [3300, 3302] executed 61 times
+Loop [11006, 11025] executed 60 times
+Loop [4675, 4694] executed 60 times
+Loop [4703, 4723] executed 60 times
+Loop [4735, 4754] executed 60 times
+Loop [4763, 4783] executed 60 times
+Loop [11189, 11196] executed 60 times
+Loop [11178, 11185] executed 60 times
+Loop [11152, 11172] executed 60 times
+Loop [11121, 11140] executed 60 times
+Loop [11074, 11081] executed 60 times
+Loop [11063, 11070] executed 60 times
+Loop [11037, 11057] executed 60 times
+Loop [12236, 12247] executed 56 times
+Loop [6373, 6384] executed 55 times
+Loop [6678, 6685] executed 55 times
+Loop [6689, 6696] executed 55 times
+Loop [6788, 6790] executed 55 times
+Loop [6328, 6333] executed 55 times
+Loop [6320, 6325] executed 55 times
+Loop [53806, 53811] executed 54 times
+Loop [53814, 53819] executed 54 times
+Loop [8920, 8925] executed 52 times
+Loop [9278, 9285] executed 52 times
+Loop [9289, 9296] executed 52 times
+Loop [9388, 9390] executed 52 times
+Loop [8973, 8984] executed 52 times
+Loop [8928, 8933] executed 52 times
+Loop [8690, 8692] executed 50 times
+Loop [8218, 8223] executed 50 times
+Loop [8226, 8231] executed 50 times
+Loop [8591, 8598] executed 50 times
+Loop [8580, 8587] executed 50 times
+Loop [8273, 8286] executed 50 times
+Loop [5673, 5686] executed 46 times
+Loop [5980, 5987] executed 46 times
+Loop [5626, 5631] executed 46 times
+Loop [5618, 5623] executed 46 times
+Loop [5991, 5998] executed 46 times
+Loop [6090, 6092] executed 46 times
+Loop [12450, 12463] executed 45 times
+Loop [12469, 12483] executed 45 times
+Loop [12515, 12524] executed 45 times
+Loop [3672, 3674] executed 45 times
+Loop [12529, 12538] executed 45 times
+Loop [12582, 12666] executed 45 times
+Loop [11801, 11814] executed 36 times
+Loop [11851, 11864] executed 36 times
+Loop [11781, 11794] executed 36 times
+Loop [12706, 12711] executed 36 times
+Loop [12714, 12719] executed 36 times
+Loop [12376, 12389] executed 36 times
+Loop [11870, 11890] executed 36 times
+Loop [5157, 5179] executed 36 times
+Loop [5126, 5147] executed 36 times
+Loop [12261, 12270] executed 36 times
+Loop [12396, 12409] executed 36 times
+Loop [3825, 3827] executed 36 times
+Loop [3700, 3713] executed 36 times
+Loop [3680, 3693] executed 36 times
+Loop [8879, 8888] executed 29 times
+Loop [8865, 8874] executed 29 times
+Loop [9231, 9240] executed 29 times
+Loop [9245, 9254] executed 29 times
+Loop [11942, 12041] executed 28 times
+Loop [12090, 12190] executed 28 times
+Loop [12505, 12507] executed 13 times
+Loop [8363, 8629] executed 11 times
+Loop [7991, 8201] executed 11 times
+Loop [5281, 5283] executed 10 times
+Loop [5077, 5082] executed 10 times
+Loop [5069, 5074] executed 10 times
+Loop [12738, 12740] executed 9 times
+Loop [3601, 3606] executed 9 times
+Loop [3593, 3598] executed 9 times
+Loop [6265, 6274] executed 8 times
+Loop [6279, 6288] executed 8 times
+Loop [6645, 6654] executed 8 times
+Loop [6631, 6640] executed 8 times
+Loop [5391, 5601] executed 7 times
+Loop [5763, 6029] executed 7 times
+Loop [9103, 9114] executed 4 times
+Loop [10237, 10248] executed 4 times
+Loop [9021, 9035] executed 4 times
+Loop [10214, 10225] executed 4 times
+Loop [8642, 8655] executed 4 times
+Loop [8809, 8901] executed 4 times
+Loop [8754, 8765] executed 4 times
+Loop [9054, 9056] executed 4 times
+Loop [8737, 8748] executed 4 times
+Loop [9120, 9131] executed 4 times
+Loop [9002, 9015] executed 4 times
+Loop [9175, 9267] executed 4 times
+Loop [8661, 8675] executed 4 times
+Loop [3773, 3782] executed 3 times
+Loop [8846, 8857] executed 3 times
+Loop [8829, 8840] executed 3 times
+Loop [9212, 9223] executed 3 times
+Loop [3787, 3796] executed 3 times
+Loop [9195, 9206] executed 3 times
+Loop [4910, 4919] executed 2 times
+Loop [4924, 4933] executed 2 times
+Loop [4174, 4176] executed 1 times
+Loop [4190, 4211] executed 1 times
+Loop [4106, 4113] executed 1 times
+Loop [4095, 4102] executed 1 times
+Loop [4221, 4243] executed 1 times
+Loop [3952, 3961] executed 1 times
+Loop [3938, 3947] executed 1 times
+Loop [3893, 3915] executed 1 times
+Loop [3862, 3883] executed 1 times
+Loop [4832, 4854] executed 1 times
+Loop [6575, 6667] executed 1 times
+Loop [6402, 6415] executed 1 times
+Loop [6421, 6435] executed 1 times
+Loop [6454, 6456] executed 1 times
+Loop [6209, 6301] executed 1 times
+Loop [6154, 6165] executed 1 times
+Loop [6137, 6148] executed 1 times
+Loop [6503, 6514] executed 1 times
+Loop [6520, 6531] executed 1 times
+Loop [6061, 6075] executed 1 times
+Loop [6042, 6055] executed 1 times
+Loop [4267, 4276] executed 1 times
+Loop [4946, 5030] executed 1 times
+Loop [4893, 4902] executed 1 times
+Loop [4879, 4888] executed 1 times
+Loop [4801, 4822] executed 1 times
+Loop [7614, 7625] executed 1 times
+Loop [7637, 7648] executed 1 times
+Loop [4605, 4635] executed 1 times
+Loop [4548, 4568] executed 1 times
+Loop [4520, 4539] executed 1 times
+Loop [4281, 4290] executed 1 times
+
+Total simple loops: 930
+Total loops: 2073908082
+Non simple loops: 2073907152
+
+Profiling data for file=benches/hello.b
+
+Instruction count:
+.: 13
+[: 1
++: 254
+<: 42
+>: 46
+-: 24
+]: 10
+
+Simple innermost loops profile data:
+Loop [10, 41] executed 9 times
+
+Total simple loops: 1
+Total loops: 9
+Non simple loops: 8
+
+Profiling data for file=benches/long.b
+
+Instruction count:
+.: 1
++: 1945531188
+<: 938533367
+[: 191129895
+>: 938533368
+-: 1945530986
+]: 1950285460
+
+Simple innermost loops profile data:
+Loop [118, 120] executed 1291315424 times
+Loop [132, 134] executed 189179592 times
+Loop [107, 116] executed 184473632 times
+Loop [92, 127] executed 88472048 times
+Loop [145, 147] executed 1930404 times
+Loop [158, 160] executed 19698 times
+
+Total simple loops: 6
+Total loops: 1759194377
+Non simple loops: 1759194371
+
+Profiling data for file=benches/loopremove.b
+
+Instruction count:
+.: 4
+[: 12
+>: 44
+-: 112
+]: 107
++: 168
+<: 32
+
+Simple innermost loops profile data:
+Loop [68, 70] executed 44 times
+Loop [72, 74] executed 44 times
+Loop [6, 8] executed 4 times
+
+Total simple loops: 3
+Total loops: 97
+Non simple loops: 94
+
+Profiling data for file=benches/mandel.b
+
+Instruction count:
+.: 6240
+[: 422534152
+-: 177623022
+>: 158068727
++: 179053599
+<: 158068717
+]: 835818921
+
+Simple innermost loops profile data:
+Loop [8266, 8304] executed 2493461 times
+Loop [7927, 7965] executed 1983204 times
+Loop [5129, 5167] executed 1798168 times
+Loop [3047, 3085] executed 1652663 times
+Loop [2640, 2678] executed 1319715 times
+Loop [9065, 9086] executed 278640 times
+Loop [1051, 1089] executed 112608 times
+Loop [8858, 8860] executed 92279 times
+Loop [1390, 1428] executed 90474 times
+Loop [4648, 4650] executed 67928 times
+Loop [9458, 9496] executed 67248 times
+Loop [1959, 1971] executed 51084 times
+Loop [9720, 9741] executed 12384 times
+Loop [10110, 10131] executed 12384 times
+Loop [2034, 2036] executed 7075 times
+Loop [9639, 9677] executed 4560 times
+Loop [8933, 8935] executed 2928 times
+Loop [10230, 10251] executed 1728 times
+Loop [395, 416] executed 720 times
+Loop [10648, 10686] executed 369 times
+Loop [10923, 10944] executed 144 times
+Loop [11363, 11384] executed 144 times
+Loop [341, 362] executed 144 times
+Loop [10839, 10877] executed 52 times
+Loop [13, 37] executed 12 times
+Loop [174, 195] executed 6 times
+
+Total simple loops: 26
+Total loops: 699939720
+Non simple loops: 699939694
+
+Profiling data for file=benches/serptri.b
+
+Instruction count:
+.: 2048
++: 79318
+<: 40946
+[: 20232
+>: 40947
+-: 79255
+]: 18467
+
+Simple innermost loops profile data:
+Loop [266, 268] executed 288 times
+Loop [352, 354] executed 242 times
+Loop [44, 49] executed 31 times
+Loop [52, 60] executed 31 times
+Loop [63, 70] executed 31 times
+Loop [112, 119] executed 31 times
+Loop [122, 130] executed 31 times
+Loop [153, 158] executed 31 times
+Loop [11, 19] executed 26 times
+Loop [22, 29] executed 26 times
+Loop [31, 36] executed 26 times
+Loop [8, 39] executed 4 times
+
+Total simple loops: 12
+Total loops: 12669
+Non simple loops: 12657
+
+Profiling data for file=benches/twinkle.b
+
+Instruction count:
+.: 601
+[: 295
+-: 49140
+>: 21107
++: 49709
+<: 20786
+]: 20786
+
+Simple innermost loops profile data:
+Loop [5061, 5068] executed 119 times
+Loop [3235, 3242] executed 119 times
+Loop [3579, 3586] executed 119 times
+Loop [3161, 3168] executed 119 times
+Loop [1263, 1270] executed 119 times
+Loop [1189, 1196] executed 119 times
+Loop [1607, 1614] executed 119 times
+Loop [2895, 2902] executed 119 times
+Loop [2821, 2828] executed 119 times
+Loop [5135, 5142] executed 119 times
+Loop [1912, 1919] executed 119 times
+Loop [444, 451] executed 119 times
+Loop [5467, 5474] executed 119 times
+Loop [26, 33] executed 119 times
+Loop [6045, 6052] executed 119 times
+Loop [100, 107] executed 119 times
+Loop [5713, 5720] executed 119 times
+Loop [5639, 5646] executed 119 times
+Loop [5012, 5019] executed 118 times
+Loop [4684, 4691] executed 118 times
+Loop [4582, 4589] executed 118 times
+Loop [4508, 4515] executed 118 times
+Loop [3001, 3008] executed 118 times
+Loop [4292, 4299] executed 118 times
+Loop [675, 682] executed 118 times
+Loop [4104, 4111] executed 118 times
+Loop [3906, 3913] executed 118 times
+Loop [4202, 4209] executed 116 times
+Loop [5268, 5275] executed 116 times
+Loop [3368, 3375] executed 116 times
+Loop [1396, 1403] executed 116 times
+Loop [5846, 5853] executed 116 times
+Loop [233, 240] executed 116 times
+Loop [2504, 2513] executed 108 times
+Loop [1977, 1986] executed 108 times
+Loop [1805, 1814] executed 108 times
+Loop [2128, 2137] executed 108 times
+Loop [3762, 3771] executed 108 times
+Loop [1043, 1052] executed 108 times
+Loop [4313, 4322] executed 108 times
+Loop [4894, 4903] executed 108 times
+Loop [576, 583] executed 100 times
+Loop [3267, 3274] executed 99 times
+Loop [3193, 3200] executed 99 times
+Loop [2927, 2934] executed 99 times
+Loop [5093, 5100] executed 99 times
+Loop [2853, 2860] executed 99 times
+Loop [5167, 5174] executed 99 times
+Loop [5671, 5678] executed 99 times
+Loop [5745, 5752] executed 99 times
+Loop [58, 65] executed 99 times
+Loop [132, 139] executed 99 times
+Loop [857, 864] executed 99 times
+Loop [2064, 2071] executed 99 times
+Loop [1221, 1228] executed 99 times
+Loop [1295, 1302] executed 99 times
+Loop [2203, 2210] executed 97 times
+Loop [945, 952] executed 95 times
+Loop [2102, 2110] executed 89 times
+Loop [1779, 1787] executed 89 times
+Loop [5951, 5959] executed 71 times
+Loop [350, 358] executed 71 times
+Loop [5373, 5381] executed 71 times
+Loop [3485, 3493] executed 71 times
+Loop [1513, 1521] executed 71 times
+Loop [2215, 2222] executed 37 times
+Loop [4255, 4262] executed 36 times
+Loop [5940, 5946] executed 35 times
+Loop [339, 345] executed 35 times
+Loop [1502, 1508] executed 35 times
+Loop [5362, 5368] executed 35 times
+Loop [3474, 3480] executed 35 times
+Loop [2031, 2038] executed 33 times
+Loop [4908, 4915] executed 32 times
+Loop [3820, 3827] executed 32 times
+Loop [956, 963] executed 32 times
+Loop [4549, 4556] executed 32 times
+Loop [4013, 4020] executed 32 times
+Loop [4658, 4665] executed 32 times
+Loop [4172, 4179] executed 32 times
+Loop [536, 543] executed 31 times
+Loop [3671, 3678] executed 31 times
+Loop [1862, 1869] executed 31 times
+Loop [639, 646] executed 31 times
+Loop [3871, 3878] executed 31 times
+Loop [1699, 1706] executed 31 times
+Loop [933, 940] executed 31 times
+Loop [5559, 5566] executed 31 times
+Loop [6137, 6144] executed 31 times
+Loop [4607, 4615] executed 29 times
+Loop [2519, 2527] executed 29 times
+Loop [744, 752] executed 29 times
+Loop [491, 499] executed 29 times
+Loop [431, 439] executed 29 times
+Loop [5386, 5394] executed 29 times
+Loop [5454, 5462] executed 29 times
+Loop [363, 371] executed 29 times
+Loop [5514, 5522] executed 29 times
+Loop [5964, 5972] executed 29 times
+Loop [6032, 6040] executed 29 times
+Loop [6092, 6100] executed 29 times
+Loop [3566, 3574] executed 29 times
+Loop [1654, 1662] executed 29 times
+Loop [4427, 4435] executed 29 times
+Loop [3498, 3506] executed 29 times
+Loop [2624, 2632] executed 29 times
+Loop [1594, 1602] executed 29 times
+Loop [1526, 1534] executed 29 times
+Loop [3626, 3634] executed 29 times
+Loop [5831, 5839] executed 28 times
+Loop [1821, 1829] executed 28 times
+Loop [3353, 3361] executed 28 times
+Loop [2339, 2347] executed 28 times
+Loop [2879, 2887] executed 28 times
+Loop [5697, 5705] executed 28 times
+Loop [218, 226] executed 28 times
+Loop [2413, 2421] executed 28 times
+Loop [2144, 2152] executed 28 times
+Loop [3219, 3227] executed 28 times
+Loop [3032, 3040] executed 28 times
+Loop [84, 92] executed 28 times
+Loop [2953, 2961] executed 28 times
+Loop [1381, 1389] executed 28 times
+Loop [1059, 1067] executed 28 times
+Loop [2567, 2575] executed 28 times
+Loop [1103, 1111] executed 28 times
+Loop [1953, 1961] executed 28 times
+Loop [4768, 4776] executed 28 times
+Loop [4870, 4878] executed 28 times
+Loop [800, 808] executed 28 times
+Loop [3980, 3988] executed 28 times
+Loop [3932, 3940] executed 28 times
+Loop [701, 709] executed 28 times
+Loop [1247, 1255] executed 28 times
+Loop [5119, 5127] executed 28 times
+Loop [3778, 3786] executed 28 times
+Loop [5253, 5261] executed 28 times
+Loop [286, 296] executed 11 times
+Loop [5887, 5897] executed 11 times
+Loop [1449, 1459] executed 11 times
+Loop [3421, 3431] executed 11 times
+Loop [5309, 5319] executed 11 times
+Loop [4378, 4389] executed 9 times
+
+Total simple loops: 143
+Total loops: 20491
+Non simple loops: 20348
