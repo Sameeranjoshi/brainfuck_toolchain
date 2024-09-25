@@ -24,7 +24,7 @@ public:
             }
         }
         input_files.clear();
-        input_files.push_back("benches/test.b");
+        input_files.push_back("benches/hello.b");
     }
 };
 
@@ -33,7 +33,7 @@ private:
     std::vector<uint8_t> tape;
     int tape_pointer;
     std::vector<char> preprocessed;
-    std::unordered_map<int, int> loop_bounds;
+    std::unordered_map<int, std::string> loop_labels;
     bool _is_profiling_enabled;
     std::unordered_map<char, int> _profiling_data;
     std::map<std::pair<int, int>, int> loop_profiled_data;    // (start, end) -> count    - e.g. [] - 10
@@ -89,8 +89,10 @@ public:
                 }
                 int start = stack.back();
                 stack.pop_back();
-                loop_bounds[start] = idx;
-                loop_bounds[idx] = start;
+                loop_labels[start] = ".L" + std::to_string(start);
+                // +"_start";
+                loop_labels[idx] = ".L" + std::to_string(start);
+                // +"_end";
             }
         }
         if (!stack.empty()) {
@@ -204,31 +206,26 @@ public:
             switch (instruction) {
                 case '>':
                     //move_right();
-                    // check out the initiali_setup_assembly_structure function and tell me what should be the assembly here
-                    assembly_file << "addq $1, %rax\n";
-                    assembly_file << "movq %rax, %r12\n";
+                    assembly_file << "\taddq $1, %r12\n";
                     break;
                 case '<':
                     //move_left();
-                    assembly_file << "subq $1, %rax\n";
-                    assembly_file << "movq %rax, %r12\n";
+                    assembly_file << "\tsubq $1, %r12\n";
                     break;
                 case '+':
                     //increment();
-                    assembly_file << "\tmovq %r12, %rax\n\n\n";
-                    assembly_file << "addb $1, (%rax)\n";
+                    assembly_file << "\taddb $1, (%r12)\n";
                     break;
                 case '-':
                     //decrement();
-                    // is the movq instruction needed here?  
-                    assembly_file << "\tmovq %r12, %rax\n\n\n";
-                    assembly_file << "subb $1, (%rax)\n";
+                    assembly_file << "\tsubb $1, (%r12)\n";
                     break;
                 case '.':
                     //write();
-                    assembly_file << "movb (%rax), %al\n";
-                    assembly_file << "movzbl %al, %edi\n";
-                    assembly_file << "call putchar\n";
+                    assembly_file << "\tmovq %r12, %rax\n";
+                    assembly_file << "\tmovb (%rax), %al\n";
+                    assembly_file << "\tmovzbl %al, %edi\n";
+                    assembly_file << "\tcall putchar\n";
                     break;
                 case ',':
                     if (std::cin.eof()) {
@@ -240,26 +237,15 @@ public:
                     }
                     break;
                 case '[':
-                    if (is_currentcell_zero()) {
-                        PC_index = loop_bounds[PC_index];
-                    }
+                    assembly_file << "#LOOP \n";
+                    assembly_file << loop_labels[PC_index] + "_start" << ":\n";
+                    assembly_file << "\tcmpb $0, (%r12)\n";
+                    assembly_file << "\tje " << loop_labels[PC_index] + "_end\n\n";
                     break;
                 case ']':
-                    if (!is_currentcell_zero()) {
-                        if (!_is_profiling_enabled){
-                            PC_index = loop_bounds[PC_index];
-                        }
-                        else{
-                            total_loops++;
-                            int loopstart = loop_bounds[PC_index];
-                            int loopend = PC_index;
-                            if (is_simple_loop(loopstart, loopend))
-                            {
-                                loop_profiled_data[{loopstart, loopend}]++; // if simple loop increment the profiling
-                            }
-                            PC_index = loopstart;
-                        }
-                    }
+                    assembly_file << "\n\tjmp " << loop_labels[PC_index] + "_start" << "\n";
+                    assembly_file << loop_labels[PC_index] + "_end" << ":\n";
+                    assembly_file << "#LOOP END\n";
                     break;
                 default:
                     std::cerr << "Failed to interpret code from file=" << filename
