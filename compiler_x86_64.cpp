@@ -32,13 +32,9 @@ private:
     int tape_pointer;
     std::vector<char> preprocessed;
     std::unordered_map<int, std::string> loop_labels;
-    bool _is_profiling_enabled;
-    std::unordered_map<char, int> _profiling_data;
-    std::map<std::pair<int, int>, int> loop_profiled_data;    // (start, end) -> count    - e.g. [] - 10
-    int total_loops;
 
 public:
-    Interpreter(int tape_size, bool profiling) : tape(tape_size, 0), tape_pointer(tape_size / 2), _is_profiling_enabled(profiling), total_loops(0) {}
+    Interpreter(int tape_size) : tape(tape_size, 0), tape_pointer(tape_size / 2) {}
 
     void preprocess_code() {
         std::vector<int> stack;
@@ -123,9 +119,6 @@ public:
         size_t PC_index = 0;
         while (PC_index < preprocessed.size()) {
             char instruction = preprocessed[PC_index];
-            // profiling
-            if (_is_profiling_enabled)
-                _profiling_data[instruction]++;
 
             switch (instruction) {
                 case '>':
@@ -174,54 +167,19 @@ public:
         final_setup_assembly_structute(assembly_file);
         std::cout << "\nSuccessfully interpreted code from file=" << filename << std::endl;
     }
-
-    void print_instr_count(std::ofstream &profiling_output) {
-        profiling_output << "\nInstruction count:" << std::endl;
-        for (const auto& [key, value] : _profiling_data) {
-            profiling_output << key << ": " << value << std::endl;
-        }
-    }
-
-    void print_simple_loops(std::ofstream &profiling_output) {
-        std::vector<std::pair<std::pair<int, int>, int>> sorted_loops(loop_profiled_data.begin(), loop_profiled_data.end());
-        std::sort(sorted_loops.begin(), sorted_loops.end(), [](const auto& a, const auto& b) {
-            return a.second > b.second;
-        });
-
-        profiling_output << "\nSimple innermost loops profile data:" << std::endl;
-        for (const auto& [loop, count] : sorted_loops) {
-            profiling_output << "Loop [" << loop.first << ", " << loop.second << "] executed " << count << " times" << std::endl;
-        }
-        profiling_output << std::endl;
-
-        int simple_loop_count = sorted_loops.size();
-        profiling_output << "Total simple loops: " << simple_loop_count << std::endl;
-        profiling_output << "Total loops: " << total_loops << std::endl;
-        profiling_output << "Non simple loops: " << total_loops - simple_loop_count << std::endl;
-    }
 };
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <input_file> [-p]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <input_file>" << std::endl;
         return 1;
     }
 
     std::string input_file = argv[1];
-    bool profiling = false;
-    if (argc > 2 && std::string(argv[2]) == "-p") {
-        profiling = true;
-    }
 
-    std::ofstream profiling_output("profiling_output.txt");
-    if (!profiling_output) {
-        std::cerr << "Failed to open profiling output file." << std::endl;
-        return 1;
-    }
+    std::cout << "Running compiler on input file = " << input_file << std::endl;
 
-    std::cout << "Running interpreter on input file = " << input_file << std::endl;
-
-    Interpreter interpreter(Constants::SIZE_OF_TAPE, profiling);
+    Interpreter interpreter(Constants::SIZE_OF_TAPE);
     std::ifstream file(input_file);
     if (!file) {
         std::cerr << "Failed to open file: " << input_file << std::endl;
@@ -235,18 +193,6 @@ int main(int argc, char* argv[]) {
 
     std::string code((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
     interpreter.interpret(code, input_file, assemblyfile);
-
-    // profiling output
-    if (profiling) {
-        profiling_output << "\nProfiling data for file=" << input_file << std::endl;
-        std::streambuf* cout_buf = std::cout.rdbuf(); // Save old buf
-        std::cout.rdbuf(profiling_output.rdbuf()); // Redirect std::cout to profiling_output
-
-        interpreter.print_instr_count(profiling_output);
-        interpreter.print_simple_loops(profiling_output);
-
-        std::cout.rdbuf(cout_buf); // Reset to standard output again
-    }
 
     assemblyfile.close();
 
