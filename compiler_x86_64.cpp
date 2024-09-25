@@ -40,41 +40,6 @@ private:
 public:
     Interpreter(int tape_size, bool profiling) : tape(tape_size, 0), tape_pointer(tape_size / 2), _is_profiling_enabled(profiling), total_loops(0) {}
 
-    void increment() {
-        tape[tape_pointer]++;
-    }
-
-    void decrement() {
-        tape[tape_pointer]--;
-    }
-
-    void move_left() {
-        if (tape_pointer == 0) {
-            tape.insert(tape.begin(), 1000, 0);
-            tape_pointer += 1000;
-        }
-        tape_pointer--;
-    }
-
-    void move_right() {
-        if (tape_pointer == tape.size() - 1) {
-            tape.insert(tape.end(), 1000, 0);
-        }
-        tape_pointer++;
-    }
-
-    void write() {
-        std::cout << static_cast<char>(tape[tape_pointer]);
-    }
-
-    void replace(uint8_t input_value) {
-        tape[tape_pointer] = input_value;
-    }
-
-    bool is_currentcell_zero() {
-        return tape[tape_pointer] == 0;
-    }
-
     void preprocess_code() {
         std::vector<int> stack;
         for (size_t idx = 0; idx < preprocessed.size(); ++idx) {
@@ -88,9 +53,7 @@ public:
                 int start = stack.back();
                 stack.pop_back();
                 loop_labels[start] = ".L" + std::to_string(start);
-                // +"_start";
                 loop_labels[idx] = ".L" + std::to_string(start);
-                // +"_end";
             }
         }
         if (!stack.empty()) {
@@ -98,34 +61,7 @@ public:
         }
     }
 
-    bool is_simple_loop(int start, int end) {
-        int net_pointer_change = 0;
-        int net_cell_change = 0;
-        for (int i = start + 1; i < end; ++i) {
-            switch (preprocessed[i]) {
-                case '>':
-                    net_pointer_change++;
-                    break;
-                case '<':
-                    net_pointer_change--;
-                    break;
-                case '+':
-                    if (net_pointer_change == 0) net_cell_change++;
-                    break;
-                case '-':
-                    if (net_pointer_change == 0) net_cell_change--;
-                    break;
-                case '.':
-                case ',':
-                    return false; // Contains I/O
-                default:
-                    break;
-            }
-        }
-        return net_pointer_change == 0 && (net_cell_change == 1 || net_cell_change == -1);
-    }
-    void final_setup_assembly_structute(std::ofstream &assembly_file){
-
+    void final_setup_assembly_structute(std::ofstream &assembly_file) {
         // Restore registers
         assembly_file << "\n\n\n# Epilogue\n";
         assembly_file << "\tpopq %r12                 # Restore r12\n";
@@ -133,14 +69,9 @@ public:
         assembly_file << "\tmovq %rbp, %rsp           # Restore stack pointer\n";
         assembly_file << "\tpopq %rbp                 # Restore base pointer\n";
         assembly_file << "\tret                       # Return to the kernel\n";
-        // // Exit the program (using syscall)
-        // assembly_file << "\tmovq $60, %rax            # syscall: exit\n";
-        // assembly_file << "\txor %rdi, %rdi            # status: 0\n";
-        // assembly_file << "\tsyscall                   # Call the kernel\n";
-        
     }
-    void initial_setup_assembly_structure(std::ofstream &assembly_file) {
 
+    void initial_setup_assembly_structure(std::ofstream &assembly_file) {
         // Text section
         assembly_file << ".section .text\n";
         assembly_file << ".globl main\n\n";
@@ -177,11 +108,6 @@ public:
         assembly_file << "\tmovq $0, %rsi              # Value to set (zero)\n";
         assembly_file << "\tmovq $30000, %rdx         # Number of bytes\n";
         assembly_file << "\tcall memset                # Call memset function\n";
-
-
-        // common string for all the assembly code
-        // assembly_file << "# Set the current pointer to rax\n";
-        // // assembly_file << "\tmovq %r12, %rax\n\n\n";
     }
 
     void interpret(const std::string& code, const std::string& filename, std::ofstream &assembly_file) {
@@ -203,23 +129,18 @@ public:
 
             switch (instruction) {
                 case '>':
-                    //move_right();
                     assembly_file << "\taddq $1, %r12\n";
                     break;
                 case '<':
-                    //move_left();
                     assembly_file << "\tsubq $1, %r12\n";
                     break;
                 case '+':
-                    //increment();
                     assembly_file << "\taddb $1, (%r12)\n";
                     break;
                 case '-':
-                    //decrement();
                     assembly_file << "\tsubb $1, (%r12)\n";
                     break;
                 case '.':
-                    //write();
                     assembly_file << "\tmovq %r12, %rax\n";
                     assembly_file << "\tmovb (%rax), %al\n";
                     assembly_file << "\tmovzbl %al, %edi\n";
@@ -260,6 +181,7 @@ public:
             profiling_output << key << ": " << value << std::endl;
         }
     }
+
     void print_simple_loops(std::ofstream &profiling_output) {
         std::vector<std::pair<std::pair<int, int>, int>> sorted_loops(loop_profiled_data.begin(), loop_profiled_data.end());
         std::sort(sorted_loops.begin(), sorted_loops.end(), [](const auto& a, const auto& b) {
