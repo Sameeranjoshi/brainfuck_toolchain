@@ -280,12 +280,15 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    Constants consts;
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <input_file> [-p]" << std::endl;
+        return 1;
+    }
+
+    std::string input_file = argv[1];
     bool profiling = false;
-    if (argc > 1){
-        if (std::string(argv[1]) == "-p"){
-            profiling = true;
-        }
+    if (argc > 2 && std::string(argv[2]) == "-p") {
+        profiling = true;
     }
 
     std::ofstream profiling_output("profiling_output.txt");
@@ -294,37 +297,36 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    for (const auto& eachfile : consts.input_files) {
-        std::cout << "Running interpreter on input file = " << eachfile << std::endl;
+    std::cout << "Running interpreter on input file = " << input_file << std::endl;
 
-        Interpreter interpreter(Constants::SIZE_OF_TAPE, profiling);
-        std::ifstream file(eachfile);
-        if (!file) {
-            std::cerr << "Failed to open file: " << eachfile << std::endl;
-            continue;
-        }
-        std::ofstream assemblyfile("assembly_output.s");
-        if (!assemblyfile) {
-            std::cerr << "Failed to open assembly output file." << std::endl;
-            return 1;
-        }
-
-        std::string code((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-        interpreter.interpret(code, eachfile, assemblyfile);
-       // profiling output
-        if (profiling) {
-            profiling_output << "\nProfiling data for file=" << eachfile << std::endl;
-            std::streambuf* cout_buf = std::cout.rdbuf(); // Save old buf
-            std::cout.rdbuf(profiling_output.rdbuf()); // Redirect std::cout to profiling_output
-
-            interpreter.print_instr_count(profiling_output);
-            interpreter.print_simple_loops(profiling_output);
-
-            std::cout.rdbuf(cout_buf); // Reset to standard output again
-        }
-
-        assemblyfile.close();
+    Interpreter interpreter(Constants::SIZE_OF_TAPE, profiling);
+    std::ifstream file(input_file);
+    if (!file) {
+        std::cerr << "Failed to open file: " << input_file << std::endl;
+        return 1;
     }
+    std::ofstream assemblyfile("assembly_output.s");
+    if (!assemblyfile) {
+        std::cerr << "Failed to open assembly output file." << std::endl;
+        return 1;
+    }
+
+    std::string code((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    interpreter.interpret(code, input_file, assemblyfile);
+
+    // profiling output
+    if (profiling) {
+        profiling_output << "\nProfiling data for file=" << input_file << std::endl;
+        std::streambuf* cout_buf = std::cout.rdbuf(); // Save old buf
+        std::cout.rdbuf(profiling_output.rdbuf()); // Redirect std::cout to profiling_output
+
+        interpreter.print_instr_count(profiling_output);
+        interpreter.print_simple_loops(profiling_output);
+
+        std::cout.rdbuf(cout_buf); // Reset to standard output again
+    }
+
+    assemblyfile.close();
 
     return 0;
 }
