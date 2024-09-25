@@ -118,8 +118,7 @@ public:
                     assembly_file << "\tsubb $1, (%r12)\n";
                     break;
                 case '.':
-                    assembly_file << "\tmovq %r12, %rax\n";
-                    assembly_file << "\tmovb (%rax), %al\n";
+                    assembly_file << "\tmovb (%r12), %al\n";
                     assembly_file << "\tmovzbl %al, %edi\n";
                     assembly_file << "\tcall putchar\n";
                     break;
