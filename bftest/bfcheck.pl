@@ -13,14 +13,17 @@ my @bfs = glob "prog-*.b";
 
 sub run1($) {
     (my $f) = @_;
-    system("../bf-interp $f < input.dat > output.dat");
+    system("clang++ -std=c++17 -O3 -o bfi ../inter_cpp.cpp");
+    system("./bfi $f < input.dat > output.dat");
 }
 
 sub run2($) {
     (my $f) = @_;
-    system("../bf-asm < $f");
-    system("clang prog.s ../bf-main.c -O -o bf");
-    system("./bf < input.dat > output.dat 2>/dev/null");
+    system("clang++ -std=c++17 -O3 -o wrapper ../compiler_x86_64.cpp");
+    system("./wrapper $f");
+    system("as -o program.o assembly_output.s");
+    system("gcc -o out program.o -lc");
+    system("./out < input.dat > output.dat 2>/dev/null");
 }
 
 my $success = 0;
