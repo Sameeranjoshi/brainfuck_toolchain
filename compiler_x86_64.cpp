@@ -23,8 +23,6 @@ public:
                 input_files.push_back(entry.path().string());
             }
         }
-        input_files.clear();
-        input_files.push_back("benches/hello.b");
     }
 };
 
@@ -228,13 +226,8 @@ public:
                     assembly_file << "\tcall putchar\n";
                     break;
                 case ',':
-                    if (std::cin.eof()) {
-                        tape[tape_pointer] = 0; // Set to 0 if end of input stream
-                    } else {
-                        char input_char;
-                        std::cin >> input_char;
-                        replace(static_cast<uint8_t>(input_char));
-                    }
+                    assembly_file << "\tcall getchar\n";
+                    assembly_file << "\tmovb %al, (%r12)\n";
                     break;
                 case '[':
                     assembly_file << "#LOOP \n";
