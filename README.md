@@ -50,3 +50,15 @@ Run the interpreter with profiling enabled:
 ```
 This generates a `profiling_output.txt` file in the current directory.
 
+### Brainfunk Compiler for X86-64
+
+Run the compiler:
+
+1. Generates the driver binary
+2. runs assembler (`as`)
+3. Links with C library using `gcc`
+4. Executes the binary
+
+```bash
+bash runassembler.sh
+```
