@@ -127,7 +127,7 @@ public:
     void final_setup_assembly_structute(std::ofstream &assembly_file){
 
         // Restore registers
-        assembly_file << "# Epilogue\n";
+        assembly_file << "\n\n\n# Epilogue\n";
         assembly_file << "\tpopq %r12                 # Restore r12\n";
         assembly_file << "\tpopq %rbx                 # Restore rbx\n";
         assembly_file << "\tmovq %rbp, %rsp           # Restore stack pointer\n";
@@ -177,6 +177,11 @@ public:
         assembly_file << "\tmovq $0, %rsi              # Value to set (zero)\n";
         assembly_file << "\tmovq $30000, %rdx         # Number of bytes\n";
         assembly_file << "\tcall memset                # Call memset function\n";
+
+
+        // common string for all the assembly code
+        // assembly_file << "# Set the current pointer to rax\n";
+        // // assembly_file << "\tmovq %r12, %rax\n\n\n";
     }
 
     void interpret(const std::string& code, const std::string& filename, std::ofstream &assembly_file) {
@@ -200,24 +205,23 @@ public:
                 case '>':
                     //move_right();
                     // check out the initiali_setup_assembly_structure function and tell me what should be the assembly here
-                    assembly_file << "movq %r12, %rax\n";
                     assembly_file << "addq $1, %rax\n";
                     assembly_file << "movq %rax, %r12\n";
                     break;
                 case '<':
                     //move_left();
-                    assembly_file << "movq %r12, %rax\n";
                     assembly_file << "subq $1, %rax\n";
                     assembly_file << "movq %rax, %r12\n";
                     break;
                 case '+':
                     //increment();
-                    assembly_file << "movq %r12, %rax\n";
+                    assembly_file << "\tmovq %r12, %rax\n\n\n";
                     assembly_file << "addb $1, (%rax)\n";
                     break;
                 case '-':
                     //decrement();
-                    assembly_file << "movq %r12, %rax\n";
+                    // is the movq instruction needed here?  
+                    assembly_file << "\tmovq %r12, %rax\n\n\n";
                     assembly_file << "subb $1, (%rax)\n";
                     break;
                 case '.':
