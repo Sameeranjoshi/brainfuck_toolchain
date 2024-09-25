@@ -11,30 +11,14 @@
 
 namespace fs = std::filesystem;
 
-class Constants {
-public:
-    static const int SIZE_OF_TAPE = 1000;
-    std::vector<std::string> input_files;
 
-    Constants() {
-        std::string directory = "benches/";
-        for (const auto& entry : fs::directory_iterator(directory)) {
-            if (entry.path().extension() == ".b") {
-                input_files.push_back(entry.path().string());
-            }
-        }
-    }
-};
-
-class Interpreter {
+class Compiler {
 private:
-    std::vector<uint8_t> tape;
-    int tape_pointer;
     std::vector<char> preprocessed;
     std::unordered_map<int, std::string> loop_labels;
 
 public:
-    Interpreter(int tape_size) : tape(tape_size, 0), tape_pointer(tape_size / 2) {}
+    Compiler() {}
 
     void preprocess_code() {
         std::vector<int> stack;
@@ -106,7 +90,7 @@ public:
         assembly_file << "\tcall memset                # Call memset function\n";
     }
 
-    void interpret(const std::string& code, const std::string& filename, std::ofstream &assembly_file) {
+    void compile(const std::string& code, const std::string& filename, std::ofstream &assembly_file) {
         for (char eachword : code) {
             if (std::string("><+-.,[]").find(eachword) != std::string::npos) {
                 preprocessed.push_back(eachword);
@@ -155,7 +139,7 @@ public:
                     assembly_file << "#LOOP END\n";
                     break;
                 default:
-                    std::cerr << "Failed to interpret code from file=" << filename
+                    std::cerr << "Failed to compile code from file=" << filename
                               << ", at position = " << PC_index
                               << ": and at instruction = '" << instruction << "'" << std::endl;
                     exit(1);
@@ -165,7 +149,7 @@ public:
         }
 
         final_setup_assembly_structute(assembly_file);
-        std::cout << "\nSuccessfully interpreted code from file=" << filename << std::endl;
+        std::cout << "\nSuccessfully compiled code from file=" << filename << std::endl;
     }
 };
 
@@ -179,7 +163,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Running compiler on input file = " << input_file << std::endl;
 
-    Interpreter interpreter(Constants::SIZE_OF_TAPE);
+    Compiler compiler;
     std::ifstream file(input_file);
     if (!file) {
         std::cerr << "Failed to open file: " << input_file << std::endl;
@@ -192,7 +176,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::string code((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    interpreter.interpret(code, input_file, assemblyfile);
+    compiler.compile(code, input_file, assemblyfile);
 
     assemblyfile.close();
 
