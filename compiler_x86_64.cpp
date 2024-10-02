@@ -8,17 +8,18 @@
 #include <cstdint>
 #include <algorithm>
 #include <map>
-
-namespace fs = std::filesystem;
-
+#include <chrono>
 
 class Compiler {
 private:
     std::vector<char> preprocessed;
     std::unordered_map<int, std::string> loop_labels;
+    bool optimize_simple_loops;
+    bool optimize_memory_scans;
 
 public:
-    Compiler() {}
+    Compiler(bool optimize_simple_loops, bool optimize_memory_scans)
+        : optimize_simple_loops(optimize_simple_loops), optimize_memory_scans(optimize_memory_scans) {}
 
     void preprocess_code() {
         std::vector<int> stack;
@@ -154,15 +155,30 @@ public:
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <input_file>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <input_file> [--optimize-simple-loops] [--optimize-memory-scans]" << std::endl;
         return 1;
     }
 
     std::string input_file = argv[1];
+    bool optimize_simple_loops = false;
+    bool optimize_memory_scans = false;
+
+    for (int i = 2; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "--optimize-simple-loops") {
+            optimize_simple_loops = true;
+        } else if (arg == "--optimize-memory-scans") {
+            optimize_memory_scans = true;
+        } else{
+            std::cerr << "Unknown command line argument: " << arg << std::endl;
+            std::cerr << "Usage: " << argv[0] << " <input_file> [--optimize-simple-loops] [--optimize-memory-scans]" << std::endl;
+            return 1;
+        }
+    }
 
     std::cout << "Running compiler on input file = " << input_file << std::endl;
 
-    Compiler compiler;
+    Compiler compiler(optimize_simple_loops, optimize_memory_scans);
     std::ifstream file(input_file);
     if (!file) {
         std::cerr << "Failed to open file: " << input_file << std::endl;
@@ -175,7 +191,13 @@ int main(int argc, char* argv[]) {
     }
 
     std::string code((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+    auto start = std::chrono::high_resolution_clock::now();
     compiler.compile(code, input_file, assemblyfile);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+
+    std::cout << "Compilation time: " << elapsed.count() << " seconds" << std::endl;
 
     assemblyfile.close();
 
