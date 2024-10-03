@@ -194,14 +194,18 @@ public:
                         if (offset == 0) {
                             continue;
                         }
-                        assembly_file << "\tmovq %r12, %rax\n";
-                        assembly_file << "\taddq $" << offset << ", %rax\n";        // rax = new index                    
-                        // multiply count with the value at the offset
-                        assembly_file << "\tmovb (%r12), %bl\n";
-                        // multiple value at bl with count
-                        assembly_file << "\timulb $" << count << ", %bl\n"; // bl = count*p[base]
-                        // add the value at the offset with the count
-                        assembly_file << "\taddb %bl, (%rax)\n"; // p[base+offset] = p[base+offset] + count*p[base]
+                        // p[base+offset] = p[base+offset] + count*p[base]
+                        // %r12 = base
+                        // (%r12) = p[base]
+                        // generate assembly for p[base+offset] = p[base+offset] + count*p[base]
+                        assembly_file << "\tmovb " << offset << "(%r12), %al\n";
+                        assembly_file << "\tmovzbl %al, %edi\n";
+                        assembly_file << "\tmovb (%r12), %al\n";
+                        assembly_file << "\tmovzbl %al, %esi\n";
+                        assembly_file << "\timull $" << count << ", %esi\n";
+                        assembly_file << "\taddl %esi, %edi\n";
+                        assembly_file << "\tmovb %dil, " << offset << "(%r12)\n";
+                        // Where is the addition at the end? It is done in the next iteration
                     }
                     // for offset=0 make // make p[offset] = 0
                     assembly_file << "\tmovb $0, (%r12)\n";
