@@ -62,3 +62,12 @@ Run the compiler:
 ```bash
 bash runassembler.sh
 ```
+Above command runs the compiler and generates assembly with and without using
+optimization flags and generates the timing results in timing_results/ folder.
+
+To control the optimization flags use
+```bash
+clang++ -std=c++17 -O3 -o compiler compiler_x86_64.cpp
+./compiler <input_file> [--optimize-simple-loops] [--optimize-memory-scans]
+```
+
