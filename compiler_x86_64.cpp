@@ -8,7 +8,6 @@
 #include <cstdint>
 #include <algorithm>
 #include <map>
-#include <chrono>
 
 class Compiler {
 private:
@@ -304,13 +303,8 @@ int main(int argc, char* argv[]) {
 
     std::string code((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
-    auto start = std::chrono::high_resolution_clock::now();
     compiler.compile(code, input_file, assemblyfile);
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed = end - start;
-
-    std::cout << "Compilation time: " << elapsed.count() << " seconds" << std::endl;
-
+    
     assemblyfile.close();
 
     return 0;
