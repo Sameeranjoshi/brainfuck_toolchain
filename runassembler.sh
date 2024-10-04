@@ -9,14 +9,15 @@ mkdir -p timing_results
 # Benchmarks in benches folder
 for file in benches/*.b; do
     # Run without --optimize-simple-loops
-    echo "Processing $file " >> timing_results/all_results_no_loop.time
+    echo "Processing $file " >> timing_results/all_results_baseline.time
     ./wrapper $file
     as -o program.o assembly_output.s 
     gcc -o out program.o -lc
     
     # Measure the time and save the result
-    { time ./out; } 2>> timing_results/all_results_no_loop.time
-    echo "" >> timing_results/all_results_no_loop.time
+    { time ./out; } 2>> timing_results/all_results_baseline.time
+    echo "" >> timing_results/all_results_baseline.time
+
 
     # Run with --optimize-simple-loops
     echo "Processing $file " >> timing_results/all_results_with_loop.time
@@ -27,4 +28,15 @@ for file in benches/*.b; do
     # Measure the time and save the result
     { time ./out; } 2>> timing_results/all_results_with_loop.time
     echo "" >> timing_results/all_results_with_loop.time
+
+    # Run with --optimize-memory-scans
+    echo "Processing $file " >> timing_results/all_results_with_scan.time
+    ./wrapper $file --optimize-memory-scans
+    as -o program.o assembly_output.s
+    gcc -o out program.o -lc
+
+    # Measure the time and save the result
+    { time ./out; } 2>> timing_results/all_results_with_scan.time
+    echo "" >> timing_results/all_results_with_scan.time
+
 done
