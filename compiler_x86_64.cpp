@@ -14,8 +14,35 @@ private:
     std::vector<char> preprocessed;
     std::unordered_map<int, std::string> loop_labels;
     std::unordered_map<int, std::unordered_map<int, int>> dollar_to_offsetcount;
+    std::unordered_map<int, std::vector<std::string>> start_simd_instructions_map;
     bool optimize_simple_loops;
     bool optimize_memory_scans;
+
+    bool is_memory_scan_loop(int pointer_movement) {
+        // Ensure net pointer movement is a power o 2
+        // use formula (n & (n-1)) == 0 to check if n is a power of 2
+        // 4 = 100, 3 = 011, 4 & 3 = 0
+        // Learnt from: https://www.geeksforgeeks.org/program-to-find-whether-a-given-number-is-power-of-2/
+        return (pointer_movement != 0)/*There should be change else false*/ && ((pointer_movement & (pointer_movement - 1)) == 0);
+    }
+
+    // Checks if contains < or > and also the net movement is a power of 2
+    int get_pointer_movement(size_t start, size_t end) {
+        int pointer_movement = 0;
+        for (size_t i = start + 1; i < end; ++i) {
+            char command = preprocessed[i];
+            if (command == '>') {
+                pointer_movement++;
+            } else if (command == '<') {
+                pointer_movement--;
+            } else {
+                return false;  // anything else is false
+            }
+        }
+        // make sure you absolute it else [<] test fails
+        pointer_movement = std::abs(pointer_movement);
+        return pointer_movement;
+    }
 
     bool is_simple_loop(size_t start, size_t end) { // [...] contains brackets
         std::unordered_map<int, int> offset_count;
@@ -71,6 +98,24 @@ private:
             }
         }
         dollar_to_offsetcount[start] = offset_count_map;
+    }
+    
+    void rewrite_Z_for_loop(size_t start, size_t end, std::vector<std::string>& simd_instructions) {
+        // use the formula start + offset * offset_count to optimize the loop and dump assembly
+                                // print some debugging code to make sure everything is working
+        
+        // print start and end
+        // std::cout << "start " << start << "end "   << end << "\n";
+        // replace [>>] -> #000
+        for (size_t i = start; i <= end; i++)
+        {
+            if (i == start){
+                preprocessed[i] = 'Z';
+            } else {
+                preprocessed[i] = '0';
+            }
+        }
+        start_simd_instructions_map[start] = simd_instructions;
     }
 
 public:
@@ -210,6 +255,13 @@ public:
                     assembly_file << "\tmovb $0, (%r12)\n";
                     assembly_file << "# Optimized loop end\n";
                     break;
+                case 'Z':
+                    assembly_file << "# SIMD Memory scan loop\n";
+                    for (auto& instruction : start_simd_instructions_map[PC_index]) {
+                        assembly_file << instruction << "\n";
+                    }
+                    assembly_file << "# SIMD Memory scan loop end\n";
+                    break;
                 case '0':
                     // this is a special case when the loop is optimized into some commands using the 
                     break;
@@ -220,6 +272,54 @@ public:
                     exit(1);
             }
         }
+    }
+
+    bool is_scan_towards_right(size_t start, size_t end) {
+        int pointer_movement = 0;
+        for (size_t i = start + 1; i < end; ++i) {
+            char command = preprocessed[i];
+            if (command == '>') {
+                pointer_movement++;
+            } else if (command == '<') {
+                pointer_movement--;
+            }
+        }
+        return pointer_movement > 0;
+    }
+
+    // Generate assembly for SIMD-based memory scanning
+    std::vector<std::string> gen_simd_memory_scan(int start, int end, bool is_direction_towards_right, int vector_length) {
+
+        std::vector<std::string> instructions;
+
+        // Generate a unique label
+        static int label_counter = 0;
+        std::string unique_label = ".L_SIMD" + std::to_string(label_counter++);
+        
+        // Emit SIMD instructions to scan 16/32/64 bytes at a time for the zero byte.
+        instructions.push_back("\tmovdqa (%r12), %xmm0     # Load " + std::to_string(vector_length) + " bytes into XMM0");
+        instructions.push_back("\tpcmpeqb %xmm0, %xmm0     # Compare all bytes with zero");
+        instructions.push_back("\tpmovmskb %xmm0, %edi     # Move mask of comparison results to EDI");
+        instructions.push_back("\ttest %edi, %edi          # Check if any byte was zero");
+        instructions.push_back("\tjz " + unique_label + "_end  # Exit loop if zero found");
+
+        instructions.push_back(unique_label + "_end:");
+        instructions.push_back("\tbsf %edi, %ecx           # Find the index of the first zero byte");
+        // print the index of the zero byte
+
+        instructions.push_back("\tmovb %cl, %al            # Move the index to AL");
+        instructions.push_back("\tmovzbl %al, %edi         # Zero extend AL to EDI");
+        instructions.push_back("\tcall putchar             # Print the index of the zero byte");
+        if (is_direction_towards_right) {
+            instructions.push_back("\taddq $" + std::to_string(vector_length) + ", %r12          # Move to the next " + std::to_string(vector_length) + "-byte block");
+        } else {
+            instructions.push_back("\tsubq $" + std::to_string(vector_length) + ", %r12          # Move to the previous " + std::to_string(vector_length) + "-byte block");
+        }
+
+        // You can expand this based on the size of memory chunks you want to scan (16, 32, or 64 bytes at once).
+        //instructions.push_back("\taddq $" + std::to_string(chunk_size) + ", %r12           # Move to the next " + std::to_string(chunk_size) + "-byte block");
+
+        return instructions;
     }
 
     void optimize(std::ofstream &assembly_file, const std::string& filename) {
@@ -246,7 +346,41 @@ public:
                 throw std::runtime_error("Unmatched '[' found");
             }
         }
+        if (optimize_memory_scans) {
+            std::vector<int> stack;
+            for (size_t idx = 0; idx < preprocessed.size(); ++idx) {
+                char command = preprocessed[idx];
+                if (command == '[') {
+                    stack.push_back(idx);
+                } else if (command == ']') {
+                    if (stack.empty()) {
+                        throw std::runtime_error("Unmatched ']' found");
+                    }
+                    int start = stack.back();
+                    stack.pop_back();
+                    int pointer_movement = get_pointer_movement(start, idx);
+                    if (is_memory_scan_loop(pointer_movement)) {
+                        // print the loop
+                        std::cout << "\nMemory scan loop found from " << start << " to " << idx << std::endl;
+                        for (size_t i = start; i <= idx; ++i) {
+                            std::cout << preprocessed[i];
+                        }
+
+                        bool is_direction_towards_right = is_scan_towards_right(start, idx);
+                        std::cout << "\nDirection: " << (is_direction_towards_right ? "Right" : "Left") << std::endl;
+
+                        int vector_length = pointer_movement;
+                        auto simd_instructions = gen_simd_memory_scan(start, idx, is_direction_towards_right, vector_length);
+                        rewrite_Z_for_loop(start, idx, simd_instructions);
+                    }
+                }
+            }
+            if (!stack.empty()) {
+                throw std::runtime_error("Unmatched '[' found");
+            }
+        }
     }
+
 
     void compile(const std::string& code, const std::string& filename, std::ofstream &assembly_file) {
         for (char eachword : code) {
