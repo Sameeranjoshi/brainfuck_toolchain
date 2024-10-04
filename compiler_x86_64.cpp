@@ -288,39 +288,39 @@ public:
     }
 
     // Generate assembly for SIMD-based memory scanning
-    std::vector<std::string> gen_simd_memory_scan(int start, int end, bool is_direction_towards_right, int vector_length) {
+std::vector<std::string> gen_simd_memory_scan(int start, int end, bool is_direction_towards_right, int vector_length) {
+    std::vector<std::string> instructions;
 
-        std::vector<std::string> instructions;
+    // Generate a unique label
+    static int label_counter = 0;
+    std::string unique_label = ".L_SIMD" + std::to_string(label_counter++);
 
-        // Generate a unique label
-        static int label_counter = 0;
-        std::string unique_label = ".L_SIMD" + std::to_string(label_counter++);
-        
-        // Emit SIMD instructions to scan 16/32/64 bytes at a time for the zero byte.
-        instructions.push_back("\tmovdqa (%r12), %xmm0     # Load " + std::to_string(vector_length) + " bytes into XMM0");
-        instructions.push_back("\tpcmpeqb %xmm0, %xmm0     # Compare all bytes with zero");
-        instructions.push_back("\tpmovmskb %xmm0, %edi     # Move mask of comparison results to EDI");
-        instructions.push_back("\ttest %edi, %edi          # Check if any byte was zero");
-        instructions.push_back("\tjz " + unique_label + "_end  # Exit loop if zero found");
+    // Use movdqu instead of movdqa for unaligned memory access
+    instructions.push_back("\tmovdqu (%r12), %xmm0     # Load " + std::to_string(vector_length) + " bytes (unaligned) into XMM0");
+    instructions.push_back("\tpcmpeqb %xmm0, %xmm0     # Compare all bytes in XMM0 with zero");
+    instructions.push_back("\tpmovmskb %xmm0, %edi     # Move mask of comparison results to EDI");
+    instructions.push_back("\ttest %edi, %edi          # Check if any byte was zero");
+    instructions.push_back("\tjz " + unique_label + "_end  # Exit loop if zero not found");
 
-        instructions.push_back(unique_label + "_end:");
-        instructions.push_back("\tbsf %edi, %ecx           # Find the index of the first zero byte");
-        // print the index of the zero byte
+    // If a zero byte is found, process it
+    instructions.push_back("\tbsf %edi, %ecx           # Find the index of the first zero byte");
+    instructions.push_back("\tmovb %cl, %al            # Move the index to AL");
+    instructions.push_back("\tmovzbl %al, %edi         # Zero extend AL to EDI");
+    instructions.push_back("\tcall putchar             # Print the index of the zero byte");
 
-        instructions.push_back("\tmovb %cl, %al            # Move the index to AL");
-        instructions.push_back("\tmovzbl %al, %edi         # Zero extend AL to EDI");
-        instructions.push_back("\tcall putchar             # Print the index of the zero byte");
-        if (is_direction_towards_right) {
-            instructions.push_back("\taddq $" + std::to_string(vector_length) + ", %r12          # Move to the next " + std::to_string(vector_length) + "-byte block");
-        } else {
-            instructions.push_back("\tsubq $" + std::to_string(vector_length) + ", %r12          # Move to the previous " + std::to_string(vector_length) + "-byte block");
-        }
-
-        // You can expand this based on the size of memory chunks you want to scan (16, 32, or 64 bytes at once).
-        //instructions.push_back("\taddq $" + std::to_string(chunk_size) + ", %r12           # Move to the next " + std::to_string(chunk_size) + "-byte block");
-
-        return instructions;
+    // Adjust memory pointer based on the direction of scanning
+    if (is_direction_towards_right) {
+        instructions.push_back("\taddq $" + std::to_string(vector_length) + ", %r12          # Move to the next " + std::to_string(vector_length) + "-byte block");
+    } else {
+        instructions.push_back("\tsubq $" + std::to_string(vector_length) + ", %r12          # Move to the previous " + std::to_string(vector_length) + "-byte block");
     }
+
+    // Add end label for the loop
+    instructions.push_back(unique_label + "_end:");
+
+    return instructions;
+}
+    
 
     void optimize(std::ofstream &assembly_file, const std::string& filename) {
         // implement simple_loop_optimization here.
