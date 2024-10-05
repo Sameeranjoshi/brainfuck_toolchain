@@ -361,13 +361,13 @@ std::vector<std::string> gen_simd_memory_scan(int start, int end, bool is_direct
                     int pointer_movement = get_pointer_movement(start, idx);
                     if (is_memory_scan_loop(pointer_movement)) {
                         // print the loop
-                        std::cout << "\nMemory scan loop found from " << start << " to " << idx << std::endl;
-                        for (size_t i = start; i <= idx; ++i) {
-                            std::cout << preprocessed[i];
-                        }
+                        // std::cout << "\nMemory scan loop found from " << start << " to " << idx << std::endl;
+                        // for (size_t i = start; i <= idx; ++i) {
+                        //     std::cout << preprocessed[i];
+                        // }
 
                         bool is_direction_towards_right = is_scan_towards_right(start, idx);
-                        std::cout << "\nDirection: " << (is_direction_towards_right ? "Right" : "Left") << std::endl;
+                        // std::cout << "\nDirection: " << (is_direction_towards_right ? "Right" : "Left") << std::endl;
 
                         int vector_length = pointer_movement;
                         auto simd_instructions = gen_simd_memory_scan(start, idx, is_direction_towards_right, vector_length);
@@ -394,7 +394,7 @@ std::vector<std::string> gen_simd_memory_scan(int start, int end, bool is_direct
         gen_assembly(assembly_file, filename);
         final_setup_assembly_structute(assembly_file);
 
-        std::cout << "\nSuccessfully compiled code from file=" << filename << std::endl;
+        // std::cout << "\nSuccessfully compiled code from file=" << filename << std::endl;
     }
 };
 
@@ -421,7 +421,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    std::cout << "Running compiler on input file = " << input_file << std::endl;
+    // std::cout << "Running compiler on input file = " << input_file << std::endl;
 
     Compiler compiler(optimize_simple_loops, optimize_memory_scans);
     std::ifstream file(input_file);
