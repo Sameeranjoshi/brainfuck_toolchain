@@ -1,0 +1,68 @@
+Processing benches/bench.b 
+
+real	0m0.012s
+user	0m0.004s
+sys	0m0.003s
+
+Processing benches/bottles.b 
+
+real	0m0.010s
+user	0m0.002s
+sys	0m0.005s
+
+Processing benches/deadcodetest.b 
+
+real	0m0.005s
+user	0m0.000s
+sys	0m0.003s
+
+Processing benches/hanoi.b 
+runassembler.sh: line 10: 253970 Segmentation fault      (core dumped) ./out
+
+real	0m0.070s
+user	0m0.010s
+sys	0m0.002s
+
+Processing benches/hello.b 
+
+real	0m0.015s
+user	0m0.001s
+sys	0m0.002s
+
+Processing benches/long.b 
+
+real	0m0.753s
+user	0m0.741s
+sys	0m0.002s
+
+Processing benches/loopremove.b 
+
+real	0m0.008s
+user	0m0.001s
+sys	0m0.003s
+
+Processing benches/mandel.b 
+
+real	0m3.323s
+user	0m3.300s
+sys	0m0.003s
+
+Processing benches/serptri.b 
+runassembler.sh: line 10: 257842 Segmentation fault      (core dumped) ./out
+
+real	0m0.123s
+user	0m0.001s
+sys	0m0.005s
+
+Processing benches/test.b 
+
+real	0m0.003s
+user	0m0.000s
+sys	0m0.002s
+
+Processing benches/twinkle.b 
+
+real	0m0.010s
+user	0m0.001s
+sys	0m0.003s
+
