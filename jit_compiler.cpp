@@ -192,15 +192,10 @@ class Compiler {
 private:
     std::vector<char> preprocessed;
     std::unordered_map<int, std::string> loop_labels;
-  // Registers used in the program:
-  //
-  // r13: the data pointer -- contains the address of memory.data()
-  //
-  // rax, rdi, rsi, rdx: used for making system calls, per the ABI.
+    // r13  == r12 from previous compiler
     CodeEmitter emitter{debug_print_machine_code};
     std::vector<uint8_t> memory;
     bool debug_print_machine_code = false;
-    std::stack<size_t> open_bracket_stack;
 
 
 public:
@@ -233,7 +228,6 @@ public:
     }
 
     void initial_setup_assembly_structure() {
-
         // movabs <address of memory.data>, %r13
         emitter.EmitBytes({0x49, 0xBD});
         emitter.EmitUint64((uint64_t)memory.data());
@@ -241,6 +235,7 @@ public:
 
     void gen_assembly(const std::string& filename) {
 
+      std::vector<int> stack;
         for (int PC_index = 0; PC_index < preprocessed.size(); ++PC_index) {
             char instruction = preprocessed[PC_index];
 
@@ -266,37 +261,38 @@ public:
                     emitter.EmitBytes({0x0F, 0x05});
                     break;
                 case ',':
-                                                        // To read one byte from stdin, call the read syscall with fd=0 (for
-                                      // stdin),
-                                      // buf=address of byte, count=1.
-                                      emitter.EmitBytes({0x48, 0xC7, 0xC0, 0x00, 0x00, 0x00, 0x00});
-                                      emitter.EmitBytes({0x48, 0xC7, 0xC7, 0x00, 0x00, 0x00, 0x00});
-                                      emitter.EmitBytes({0x4C, 0x89, 0xEE});
-                                      emitter.EmitBytes({0x48, 0xC7, 0xC2, 0x01, 0x00, 0x00, 0x00});
-                                      emitter.EmitBytes({0x0F, 0x05});
-                                                        break;
-                                                    case '[':
-                                                        // cmpb $0, 0(%r13)
-                                      emitter.EmitBytes({0x41, 0x80, 0x7d, 0x00, 0x00});
+                        // To read one byte from stdin, call the read syscall with 
+                        // fd=0 (forstdin),
+                        // buf=address of byte, 
+                        // count=1.
+                        emitter.EmitBytes({0x48, 0xC7, 0xC0, 0x00, 0x00, 0x00, 0x00});
+                        emitter.EmitBytes({0x48, 0xC7, 0xC7, 0x00, 0x00, 0x00, 0x00});
+                        emitter.EmitBytes({0x4C, 0x89, 0xEE});
+                        emitter.EmitBytes({0x48, 0xC7, 0xC2, 0x01, 0x00, 0x00, 0x00});
+                        emitter.EmitBytes({0x0F, 0x05});
+                                          break;
+                case '[':
+                        // cmpb $0, 0(%r13)
+                        emitter.EmitBytes({0x41, 0x80, 0x7d, 0x00, 0x00});
 
-                                      // Save the location in the stack, and emit JZ (with 32-bit relative
-                                      // offset) with 4 placeholder zeroes that will be fixed up later.
-                                      open_bracket_stack.push(emitter.size());
-                                      emitter.EmitBytes({0x0F, 0x84});
-                                      emitter.EmitUint32(0);
-                    break;
+                        // Save the location in the stack, and emit JZ (with 32-bit relative
+                        // offset) with 4 placeholder zeroes that will be fixed up later.
+                        stack.push_back(emitter.size());
+                        emitter.EmitBytes({0x0F, 0x84});
+                        emitter.EmitUint32(0);
+                    break;               
                 case ']':
                 {
-                      if (open_bracket_stack.empty()) {
-                        std::cerr << "unmatched closing ']' at pc=" << PC_index;
+                      if (stack.empty()) {
+                        throw std::runtime_error("Unmatched ']' found");
                       }
-                      size_t open_bracket_offset = open_bracket_stack.top();
-                      open_bracket_stack.pop();
+                      int start = stack.back();
+                      stack.pop_back();
 
                       // cmpb $0, 0(%r13)
                       emitter.EmitBytes({0x41, 0x80, 0x7d, 0x00, 0x00});
 
-                      // open_bracket_offset points to the JZ that jumps to this closing
+                      // start points to the JZ that jumps to this closing
                       // bracket. We'll need to fix up the offset for that JZ, as well as emit a
                       // JNZ with a correct offset back. Note that both [ and ] jump to the
                       // instruction *after* the matching bracket if their condition is
@@ -306,7 +302,7 @@ public:
                       // the jump instruction, and the target is the instruction after the one
                       // saved on the stack.
                       size_t jump_back_from = emitter.size() + 6;
-                      size_t jump_back_to = open_bracket_offset + 6;
+                      size_t jump_back_to = start + 6;
                       uint32_t pcrel_offset_back =
                           compute_relative_32bit_offset(jump_back_from, jump_back_to);
 
@@ -317,44 +313,43 @@ public:
                       // Also fix up the forward jump at the matching [. Note that here we don't
                       // need to add the size of this jmp to the "jump to" offset, since the jmp
                       // was already emitted and the emitter size was bumped forward.
-                      size_t jump_forward_from = open_bracket_offset + 6;
+                      size_t jump_forward_from = start + 6;
                       size_t jump_forward_to = emitter.size();
                       uint32_t pcrel_offset_forward =
                           compute_relative_32bit_offset(jump_forward_from, jump_forward_to);
-                      emitter.ReplaceUint32AtOffset(open_bracket_offset + 2,
+                      emitter.ReplaceUint32AtOffset(start + 2,
                                                     pcrel_offset_forward);
                     break;
                 }
                 default:
-                    std::cerr << "Failed to compile code from file=" << filename
+                    std::cerr << "Failed to JIT compile code from file=" << filename
                               << ", at position = " << PC_index
                               << ": and at instruction = '" << instruction << "'" << std::endl;
                     exit(1);
             }
         }
+        if (!stack.empty()) {
+          throw std::runtime_error("Unmatched '[' found");
+        }
     }
     
-    void compile(const std::string& code, const std::string& filename) {
+    void preprocessing_code(const std::string& code){
         for (char eachword : code) {
             if (std::string("><+-.,[]").find(eachword) != std::string::npos) {
                 preprocessed.push_back(eachword);
             }
         }
-        assign_loop_label();
+    }
+
+    void compile(const std::string& code, const std::string& filename) {
+        preprocessing_code(code);
+        // assign_loop_label();
         initial_setup_assembly_structure();
         gen_assembly(filename);
         final_setup_assembly_structute();
 
-        
-        // Load the emitted code to executable memory and run it.
+        // JITTING setup
         std::vector<uint8_t> emitted_code = emitter.code();
-
-        // std::cout << std::hex << std::setfill('0');
-        // for (auto each : emitted_code) {
-        //     std::cout << std::setw(2) << static_cast<int>(each) << " ";
-        // }
-        // std::cout << std::dec << std::setfill(' ');
-
         JitProgram jit_program(emitted_code);
         using JittedFunc = void (*)(void);
         JittedFunc func = (JittedFunc)jit_program.program_memory();
@@ -365,15 +360,15 @@ public:
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <input_file> [--verbose]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <input_file> [--machine_code]" << std::endl;
         return 1;
     }
     std::string input_file = argv[1];
-    bool verbose = (argc > 2 && std::string(argv[2]) == "--verbose");
+    bool machine_code = (argc > 2 && std::string(argv[2]) == "--machine_code");
 
     std::cout << "Running JIT on input file = " << input_file << std::endl;
 
-    Compiler compiler(verbose);
+    Compiler compiler(machine_code);
     std::ifstream file(input_file);
     if (!file) {
         std::cerr << "Failed to open file: " << input_file << std::endl;
