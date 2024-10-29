@@ -12,23 +12,46 @@
 #include <cstddef>
 #include <cstdint>
 #include <vector>
+#include <cassert>
+#include <cstring>
+#include <limits>
+#include <sys/mman.h>
+
 
 constexpr int MEMORY_SIZE = 30000;
 
-// Represents a JITed program in memory. Create it with a vector of code
-// encoded as a binary sequence.
-//
-// The constructor maps memory with proper permissions and copies the
-// code into it. The pointer returned by program_memory() then points to
-// the code in executable memory. When JitProgram dies, it automatically
-// cleans up the memory it mapped.
-class JitProgram {
-public:
-  JitProgram(const std::vector<uint8_t>& code);
-  ~JitProgram();
 
-  // Get the pointer to program memory. This pointer is valid only as long as
-  // the JitProgram object is alive.
+class JitProgramMemory {
+public:
+
+  JitProgramMemory(const std::vector<uint8_t>& code) {
+    program_size_ = code.size();
+    // allocate memory that is writable and executable
+    void *ptr = mmap(0, program_size_, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (ptr == (void*)-1) {
+      perror("mmap");
+      std::cerr << "unable to allocate writable memory";
+    }
+    else 
+      program_memory_ = ptr;
+      
+    memcpy(program_memory_, code.data(), program_size_);
+    // mark memory as executable only
+    if (mprotect(program_memory_, program_size_, PROT_READ | PROT_EXEC) == -1) {
+      perror("mprotect");
+      std::cerr << "unable to mark memory as executable";
+    }
+  }
+
+  ~JitProgramMemory() {
+    if (program_memory_ != nullptr) {
+      if (munmap(program_memory_, program_size_) < 0) {
+        perror("munmap");
+        std::cerr << "unable to unmap memory";
+      }
+    }
+  }
+
   void* program_memory() {
     return program_memory_;
   }
@@ -42,26 +65,52 @@ private:
   size_t program_size_ = 0;
 };
 
-// Helps emit a binary stream of code into a buffer. Entities larger than 8 bits
-// are emitted in little endian.
 class CodeEmitter {
 public:
+
   CodeEmitter() = default;
   CodeEmitter(bool debug_print_machine_code) : debug_print_machine_code(debug_print_machine_code) {}
 
-  void EmitByte(uint8_t v);
+  void EmitByte(uint8_t v) {
+    code_.push_back(v);
+    if (debug_print_machine_code)
+      std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(v) << " ";
+  }
 
   // Emits a sequence of consecutive bytes.
-  void EmitBytes(std::initializer_list<uint8_t> seq);
-
-  void EmitUint32(uint32_t v);
-  void EmitUint64(uint64_t v);
-
+  void EmitBytes(std::initializer_list<uint8_t> seq) {
+    for (auto v : seq) {
+      EmitByte(v);
+    }
+    if (debug_print_machine_code)
+      std::cout << std::endl;
+  }
+  
   // Replaces the byte at 'offset' with 'v'. Assumes offset < size().
-  void ReplaceByteAtOffset(size_t offset, uint8_t v);
-
+  void ReplaceByteAtOffset(size_t offset, uint8_t v) {
+    assert(offset < code_.size() && "replacement fits in code");
+    code_[offset] = v;
+  }
+  
   // Replaces the 32-bit word at 'offset' with 'v'. Assumes offset + 3 < size().
-  void ReplaceUint32AtOffset(size_t offset, uint32_t v);
+  void ReplaceUint32AtOffset(size_t offset, uint32_t v) {
+    ReplaceByteAtOffset(offset, v & 0xFF);
+    ReplaceByteAtOffset(offset + 1, (v >> 8) & 0xFF);
+    ReplaceByteAtOffset(offset + 2, (v >> 16) & 0xFF);
+    ReplaceByteAtOffset(offset + 3, (v >> 24) & 0xFF);
+  }
+
+  void EmitUint32(uint32_t v) {
+    EmitByte(v & 0xFF);
+    EmitByte((v >> 8) & 0xFF);
+    EmitByte((v >> 16) & 0xFF);
+    EmitByte((v >> 24) & 0xFF);
+  }
+
+  void EmitUint64(uint64_t v) {
+    EmitUint32(v & 0xFFFFFFFF);
+    EmitUint32((v >> 32) & 0xFFFFFFFF);
+  }
 
   size_t size() const {
     return code_.size();
@@ -76,100 +125,7 @@ private:
   bool debug_print_machine_code = false;
 };
 
-// Utilities for writing a JIT.
-//
-// Note: the implementation is POSIX-specific, requiring mmap/munmap with
-// appropriate flags.
-//
-// Eli Bendersky [http://eli.thegreenplace.net]
-// This code is in the public domain.
-#include <cassert>
-#include <cstring>
-#include <limits>
-#include <sys/mman.h>
 
-// Allocates RW memory of given size and returns a pointer to it. On failure,
-// prints out the error and returns nullptr. mmap is used to allocate, so
-// deallocation has to be done with munmap, and the memory is allocated
-// on a page boundary so it's suitable for calling mprotect.
-void* alloc_writable_memory(size_t size) {
-  void* ptr =
-      mmap(0, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-  if (ptr == (void*)-1) {
-    perror("mmap");
-    return nullptr;
-  }
-  return ptr;
-}
-
-// Sets a RX permission on the given memory, which must be page-aligned. Returns
-// 0 on success. On failure, prints out the error and returns -1.
-int make_memory_executable(void* m, size_t size) {
-  if (mprotect(m, size, PROT_READ | PROT_EXEC) == -1) {
-    perror("mprotect");
-    return -1;
-  }
-  return 0;
-}
-
-JitProgram::JitProgram(const std::vector<uint8_t>& code) {
-  program_size_ = code.size();
-  program_memory_ = alloc_writable_memory(program_size_);
-  if (program_memory_ == nullptr) {
-    std::cerr << "unable to allocate writable memory";
-  }
-  memcpy(program_memory_, code.data(), program_size_);
-  if (make_memory_executable(program_memory_, program_size_) < 0) {
-    std::cerr << "unable to mark memory as executable";
-  }
-}
-
-JitProgram::~JitProgram() {
-  if (program_memory_ != nullptr) {
-    if (munmap(program_memory_, program_size_) < 0) {
-      perror("munmap");
-      std::cerr << "unable to unmap memory";
-    }
-  }
-}
-
-void CodeEmitter::EmitByte(uint8_t v) {
-  code_.push_back(v);
-  if (debug_print_machine_code)
-    std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(v) << " ";
-}
-
-void CodeEmitter::EmitBytes(std::initializer_list<uint8_t> seq) {
-  for (auto v : seq) {
-    EmitByte(v);
-  }
-  if (debug_print_machine_code)
-    std::cout << std::endl;
-}
-
-void CodeEmitter::ReplaceByteAtOffset(size_t offset, uint8_t v) {
-  assert(offset < code_.size() && "replacement fits in code");
-  code_[offset] = v;
-}
-
-void CodeEmitter::ReplaceUint32AtOffset(size_t offset, uint32_t v) {
-  ReplaceByteAtOffset(offset, v & 0xFF);
-  ReplaceByteAtOffset(offset + 1, (v >> 8) & 0xFF);
-  ReplaceByteAtOffset(offset + 2, (v >> 16) & 0xFF);
-  ReplaceByteAtOffset(offset + 3, (v >> 24) & 0xFF);
-}
-
-void CodeEmitter::EmitUint32(uint32_t v) {
-  EmitByte(v & 0xFF);
-  EmitByte((v >> 8) & 0xFF);
-  EmitByte((v >> 16) & 0xFF);
-  EmitByte((v >> 24) & 0xFF);
-}
-
-void CodeEmitter::EmitUint64(uint64_t v) {
-  EmitUint32(v & 0xFFFFFFFF);
-  EmitUint32((v >> 32) & 0xFFFFFFFF);
-}
 
 uint32_t compute_relative_32bit_offset(size_t jump_from, size_t jump_to) {
   if (jump_to >= jump_from) {
@@ -191,7 +147,6 @@ uint32_t compute_relative_32bit_offset(size_t jump_from, size_t jump_to) {
 class Compiler {
 private:
     std::vector<char> preprocessed;
-    std::unordered_map<int, std::string> loop_labels;
     // r13  == r12 from previous compiler
     CodeEmitter emitter{debug_print_machine_code};
     std::vector<uint8_t> memory;
@@ -201,26 +156,6 @@ private:
 public:
     Compiler(bool debug_print = false) : memory(MEMORY_SIZE, 0), debug_print_machine_code(debug_print), emitter(debug_print) {
         // Does nothing
-    }
-    void assign_loop_label() {
-        std::vector<int> stack;
-        for (size_t idx = 0; idx < preprocessed.size(); ++idx) {
-            char command = preprocessed[idx];
-            if (command == '[') {
-                stack.push_back(idx);
-            } else if (command == ']') {
-                if (stack.empty()) {
-                    throw std::runtime_error("Unmatched ']' found");
-                }
-                int start = stack.back();
-                stack.pop_back();
-                loop_labels[start] = ".L" + std::to_string(start);
-                loop_labels[idx] = ".L" + std::to_string(start);
-            }
-        }
-        if (!stack.empty()) {
-            throw std::runtime_error("Unmatched '[' found");
-        }
     }
 
     void final_setup_assembly_structute() {
@@ -261,64 +196,47 @@ public:
                     emitter.EmitBytes({0x0F, 0x05});
                     break;
                 case ',':
-                        // To read one byte from stdin, call the read syscall with 
-                        // fd=0 (forstdin),
-                        // buf=address of byte, 
-                        // count=1.
-                        emitter.EmitBytes({0x48, 0xC7, 0xC0, 0x00, 0x00, 0x00, 0x00});
-                        emitter.EmitBytes({0x48, 0xC7, 0xC7, 0x00, 0x00, 0x00, 0x00});
-                        emitter.EmitBytes({0x4C, 0x89, 0xEE});
-                        emitter.EmitBytes({0x48, 0xC7, 0xC2, 0x01, 0x00, 0x00, 0x00});
-                        emitter.EmitBytes({0x0F, 0x05});
-                                          break;
+                    
+                    emitter.EmitBytes({0x48, 0xC7, 0xC0, 0x00, 0x00, 0x00, 0x00});
+                    emitter.EmitBytes({0x48, 0xC7, 0xC7, 0x00, 0x00, 0x00, 0x00});
+                    emitter.EmitBytes({0x4C, 0x89, 0xEE});
+                    emitter.EmitBytes({0x48, 0xC7, 0xC2, 0x01, 0x00, 0x00, 0x00});
+                    emitter.EmitBytes({0x0F, 0x05});
+                    break;
                 case '[':
-                        // cmpb $0, 0(%r13)
-                        emitter.EmitBytes({0x41, 0x80, 0x7d, 0x00, 0x00});
-
-                        // Save the location in the stack, and emit JZ (with 32-bit relative
-                        // offset) with 4 placeholder zeroes that will be fixed up later.
-                        stack.push_back(emitter.size());
-                        emitter.EmitBytes({0x0F, 0x84});
-                        emitter.EmitUint32(0);
+                    // cmpb $0, 0(%r13)
+                    emitter.EmitBytes({0x41, 0x80, 0x7d, 0x00, 0x00});
+                    // jz <offset>
+                    stack.push_back(emitter.size());
+                    emitter.EmitBytes({0x0F, 0x84});
+                    emitter.EmitUint32(0);
                     break;               
                 case ']':
                 {
-                      if (stack.empty()) {
-                        throw std::runtime_error("Unmatched ']' found");
-                      }
-                      int start = stack.back();
-                      stack.pop_back();
+                    if (stack.empty()) {
+                      throw std::runtime_error("Unmatched ']' found");
+                    }
+                    int start = stack.back();
+                    stack.pop_back();
 
-                      // cmpb $0, 0(%r13)
-                      emitter.EmitBytes({0x41, 0x80, 0x7d, 0x00, 0x00});
+                    // cmpb $0, 0(%r13)
+                    emitter.EmitBytes({0x41, 0x80, 0x7d, 0x00, 0x00});
 
-                      // start points to the JZ that jumps to this closing
-                      // bracket. We'll need to fix up the offset for that JZ, as well as emit a
-                      // JNZ with a correct offset back. Note that both [ and ] jump to the
-                      // instruction *after* the matching bracket if their condition is
-                      // fulfilled.
+                    size_t jump_back_from = emitter.size() + 6;
+                    size_t jump_back_to = start + 6;
+                    uint32_t pcrel_offset_back =
+                        compute_relative_32bit_offset(jump_back_from, jump_back_to);
 
-                      // Compute the offset for this jump. The jump start is computed from after
-                      // the jump instruction, and the target is the instruction after the one
-                      // saved on the stack.
-                      size_t jump_back_from = emitter.size() + 6;
-                      size_t jump_back_to = start + 6;
-                      uint32_t pcrel_offset_back =
-                          compute_relative_32bit_offset(jump_back_from, jump_back_to);
+                    // jnz <open_bracket_location>
+                    emitter.EmitBytes({0x0F, 0x85});
+                    emitter.EmitUint32(pcrel_offset_back);
 
-                      // jnz <open_bracket_location>
-                      emitter.EmitBytes({0x0F, 0x85});
-                      emitter.EmitUint32(pcrel_offset_back);
-
-                      // Also fix up the forward jump at the matching [. Note that here we don't
-                      // need to add the size of this jmp to the "jump to" offset, since the jmp
-                      // was already emitted and the emitter size was bumped forward.
-                      size_t jump_forward_from = start + 6;
-                      size_t jump_forward_to = emitter.size();
-                      uint32_t pcrel_offset_forward =
-                          compute_relative_32bit_offset(jump_forward_from, jump_forward_to);
-                      emitter.ReplaceUint32AtOffset(start + 2,
-                                                    pcrel_offset_forward);
+                    size_t jump_forward_from = start + 6;
+                    size_t jump_forward_to = emitter.size();
+                    uint32_t pcrel_offset_forward =
+                        compute_relative_32bit_offset(jump_forward_from, jump_forward_to);
+                    emitter.ReplaceUint32AtOffset(start + 2,
+                                                  pcrel_offset_forward);
                     break;
                 }
                 default:
@@ -343,14 +261,13 @@ public:
 
     void compile(const std::string& code, const std::string& filename) {
         preprocessing_code(code);
-        // assign_loop_label();
         initial_setup_assembly_structure();
         gen_assembly(filename);
         final_setup_assembly_structute();
 
         // JITTING setup
         std::vector<uint8_t> emitted_code = emitter.code();
-        JitProgram jit_program(emitted_code);
+        JitProgramMemory jit_program(emitted_code);
         using JittedFunc = void (*)(void);
         JittedFunc func = (JittedFunc)jit_program.program_memory();
         func();
