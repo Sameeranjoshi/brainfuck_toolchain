@@ -26,6 +26,6 @@ run_benchmark() {
 }
 
 mkdir -p ../timing_results_llvm
-for file in ../benches/*.b; do
+for file in ../benches/hello.b; do
     run_benchmark $file "" "../timing_results_llvm/all_results_llvm_baseline.time"
 done

@@ -221,6 +221,13 @@ void llvm_apis(){
     llvm::raw_fd_ostream dest("output.ll", EC, llvm::sys::fs::OF_None);
     module.print(dest, nullptr);
 
+    // verify module
+    auto res = llvm::verifyModule(module, &llvm::errs());
+    assert(!res);
+
+    // once verified call optimizations
+    
+    
 }
 
 
