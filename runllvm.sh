@@ -1,7 +1,14 @@
 
 #AOT
 # Commands
-clang++ -std=c++17 -O3 -o llvmcompiler aot_llvm.cpp
+mkdir -p build
+cd build
+cmake -DLLVM_DIR=/usr/lib64/cmake/llvm/ -G Ninja ..
+ninja
+
+# now you should find a aot_llvm file in the build folder
+# Replaces:    clang++ -std=c++17 -O3 -o aot_llvm aot_llvm.cpp 
+
 
 # Benchmarks in benches folder
 run_benchmark() {
@@ -9,13 +16,16 @@ run_benchmark() {
     local result_file=$3
 
     echo "Processing $file " >> $result_file
-    ./llvmcompiler $file
-    as -o program.o assembly_output.s
-    gcc -o out program.o -lc
+    ./aot_llvm $file
+    llc -march=x86-64 output.ll -o output.s
+    gcc output.s -o out
+    ./out
+
     { time ./out ; } 2>> $result_file
     echo "" >> $result_file
 }
 
-for file in benches/*.b; do
-    run_benchmark $file "" "timing_results_jit/all_results_llvm_baseline.time"
+mkdir -p ../timing_results_llvm
+for file in ../benches/*.b; do
+    run_benchmark $file "" "../timing_results_llvm/all_results_llvm_baseline.time"
 done

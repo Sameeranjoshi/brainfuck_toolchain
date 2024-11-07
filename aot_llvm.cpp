@@ -8,6 +8,25 @@
 #include <cstdint>
 #include <algorithm>
 #include <map>
+// LLVM headers
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Module.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Verifier.h>
+#include <llvm/IR/Value.h>
+#include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Target/TargetMachine.h>
+#include <llvm/Support/Host.h>
+#include <llvm/Support/raw_ostream.h>
+#include <llvm/Target/TargetOptions.h>
+#include <llvm/MC/TargetRegistry.h>
+#include <llvm/Support/FileSystem.h>
+
 
 class Compiler {
 private:
@@ -167,6 +186,45 @@ public:
     }
 };
 
+llvm::Function* createMainFunction(llvm::Module& module, llvm::LLVMContext& context) {
+    // Define the `main` function signature
+    llvm::FunctionType* mainType = llvm::FunctionType::get(
+        llvm::Type::getInt32Ty(context), {}, false);
+    llvm::Function* mainFunc = llvm::Function::Create(
+        mainType, llvm::Function::ExternalLinkage, "main", module);
+
+    // Create a new basic block for main
+    llvm::BasicBlock* entry = llvm::BasicBlock::Create(context, "entry", mainFunc);
+    llvm::IRBuilder<> builder(entry);
+
+    // Return a simple integer from main
+    builder.CreateRet(llvm::ConstantInt::get(context, llvm::APInt(32, 0)));
+
+    return mainFunc;
+}
+
+void llvm_apis(){
+    llvm::LLVMContext context;
+    llvm::Module module("my_module", context);
+
+    // Create a main function
+    createMainFunction(module, context);
+
+    // The rest of your setup code
+    llvm::InitializeNativeTarget();
+    llvm::InitializeNativeTargetAsmPrinter();
+    auto targetTriple = llvm::sys::getDefaultTargetTriple();
+    module.setTargetTriple(targetTriple);
+
+    // Write the module to output.ll
+    std::error_code EC;
+    llvm::raw_fd_ostream dest("output.ll", EC, llvm::sys::fs::OF_None);
+    module.print(dest, nullptr);
+
+}
+
+
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <input_file> " << std::endl;
@@ -174,9 +232,6 @@ int main(int argc, char* argv[]) {
     }
 
     std::string input_file = argv[1];
-
-    // std::cout << "Running compiler on input file = " << input_file << std::endl;
-
     Compiler compiler;
     std::ifstream file(input_file);
     if (!file) {
@@ -195,5 +250,6 @@ int main(int argc, char* argv[]) {
     
     assemblyfile.close();
 
+    llvm_apis();
     return 0;
 }
