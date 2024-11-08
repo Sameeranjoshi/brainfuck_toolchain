@@ -20,7 +20,6 @@ run_benchmark() {
     llc -march=x86-64 output.ll -o output.s
     gcc output.s -o out
     ./out
-
     { time ./out ; } 2>> $result_file
     echo "" >> $result_file
 }

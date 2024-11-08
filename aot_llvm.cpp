@@ -17,15 +17,16 @@
 #include <llvm/IR/Verifier.h>
 #include <llvm/IR/Value.h>
 #include <llvm/IR/BasicBlock.h>
-#include <llvm/IR/Constants.h>
-#include <llvm/IR/Instructions.h>
+// #include <llvm/IR/Constants.h>
+// #include <llvm/IR/Instructions.h>
 #include <llvm/Support/TargetSelect.h>
-#include <llvm/Target/TargetMachine.h>
+#include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
 #include <llvm/Support/raw_ostream.h>
-#include <llvm/Target/TargetOptions.h>
-#include <llvm/MC/TargetRegistry.h>
-#include <llvm/Support/FileSystem.h>
+// #include <llvm/Target/TargetOptions.h>
+// #include <llvm/Target/TargetMachine.h>
+// #include <llvm/MC/TargetRegistry.h>
+
 
 
 class Compiler {
@@ -171,66 +172,95 @@ public:
         }
     }
 
-    void compile(const std::string& code, const std::string& filename, std::ofstream &assembly_file) {
+    llvm::Function* createPrintTesting(llvm::Module& module, llvm::LLVMContext& context) {
+        // Define the `printTesting` function signature
+        llvm::FunctionType* printTestingType = llvm::FunctionType::get(
+            llvm::Type::getVoidTy(context), {}, false);
+        llvm::Function* printTestingFunc = llvm::Function::Create(
+            printTestingType, llvm::Function::ExternalLinkage, "printTesting", module);
+
+        // Create a new basic block for printTesting
+        llvm::BasicBlock* entry = llvm::BasicBlock::Create(context, "entry", printTestingFunc);
+        llvm::IRBuilder<> builder(entry);
+
+        // Create a global string constant for "Testing LLVM\n"
+        llvm::Value* testingStr = builder.CreateGlobalStringPtr("Testing LLVM\n");
+        // Call `printf` with the string as the argument
+        llvm::FunctionType* printfType = llvm::FunctionType::get(
+            llvm::Type::getInt32Ty(context), {llvm::Type::getInt8PtrTy(context)}, true);
+        llvm::FunctionCallee printfFunc = module.getOrInsertFunction("printf", printfType);
+        builder.CreateCall(printfFunc, {testingStr});
+
+        // Return from the function
+        builder.CreateRetVoid();
+
+        return printTestingFunc;
+    }
+    
+    llvm::Function* createMainFunction(llvm::Module& module, llvm::LLVMContext& context) {
+        // Define the `main` function signature
+        llvm::FunctionType* mainType = llvm::FunctionType::get(
+            llvm::Type::getInt32Ty(context), {}, false);
+        llvm::Function* mainFunc = llvm::Function::Create(
+            mainType, llvm::Function::ExternalLinkage, "main", module);
+
+        // Create a new basic block for main
+        llvm::BasicBlock* entry = llvm::BasicBlock::Create(context, "entry", mainFunc);
+        llvm::IRBuilder<> builder(entry);
+
+        // Call printTesting function
+        llvm::Function* printTestingFunc = module.getFunction("printTesting");
+        builder.CreateCall(printTestingFunc);
+
+        // Return a simple integer from main
+        builder.CreateRet(llvm::ConstantInt::get(context, llvm::APInt(32, 0)));
+
+        return mainFunc;
+    }
+
+    void preprocess(const std::string& code) {
         for (char eachword : code) {
             if (std::string("><+-.,[]").find(eachword) != std::string::npos) {
                 preprocessed.push_back(eachword);
             }
         }
-        assign_loop_label();
-        initial_setup_assembly_structure(assembly_file);
-        gen_assembly(assembly_file, filename);
-        final_setup_assembly_structute(assembly_file);
+    }
+
+    void lower_to_llvm(const std::string& code, const std::string& filename, llvm::Module& module, llvm::LLVMContext& context) {
+        preprocess(code);
+        createPrintTesting(module, context);
+        createMainFunction(module, context);
+        
+        // assign_loop_label();
+        // initial_setup_assembly_structure(assembly_file);
+        // gen_assembly(assembly_file, filename);
+        // final_setup_assembly_structute(assembly_file);
 
         // std::cout << "\nSuccessfully compiled code from file=" << filename << std::endl;
     }
 };
 
-llvm::Function* createMainFunction(llvm::Module& module, llvm::LLVMContext& context) {
-    // Define the `main` function signature
-    llvm::FunctionType* mainType = llvm::FunctionType::get(
-        llvm::Type::getInt32Ty(context), {}, false);
-    llvm::Function* mainFunc = llvm::Function::Create(
-        mainType, llvm::Function::ExternalLinkage, "main", module);
+void post_instr_lowering(llvm::Module& module, llvm::LLVMContext& context) {
 
-    // Create a new basic block for main
-    llvm::BasicBlock* entry = llvm::BasicBlock::Create(context, "entry", mainFunc);
-    llvm::IRBuilder<> builder(entry);
-
-    // Return a simple integer from main
-    builder.CreateRet(llvm::ConstantInt::get(context, llvm::APInt(32, 0)));
-
-    return mainFunc;
-}
-
-void llvm_apis(){
-    llvm::LLVMContext context;
-    llvm::Module module("my_module", context);
-
-    // Create a main function
-    createMainFunction(module, context);
-
-    // The rest of your setup code
+    // rest of code 
+    
+    // setup target
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
     auto targetTriple = llvm::sys::getDefaultTargetTriple();
     module.setTargetTriple(targetTriple);
 
-    // Write the module to output.ll
-    std::error_code EC;
-    llvm::raw_fd_ostream dest("output.ll", EC, llvm::sys::fs::OF_None);
-    module.print(dest, nullptr);
-
     // verify module
     auto res = llvm::verifyModule(module, &llvm::errs());
     assert(!res);
 
-    // once verified call optimizations
-    
-    
+    // TODO: optimize
+
+    // Write the module to output.ll
+    std::error_code EC;
+    llvm::raw_fd_ostream dest("output.ll", EC, llvm::sys::fs::OF_None);
+    module.print(dest, nullptr);   
 }
-
-
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -238,25 +268,23 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // input file
     std::string input_file = argv[1];
-    Compiler compiler;
     std::ifstream file(input_file);
     if (!file) {
         std::cerr << "Failed to open file: " << input_file << std::endl;
         return 1;
     }
-    std::ofstream assemblyfile("assembly_output.s");
-    if (!assemblyfile) {
-        std::cerr << "Failed to open assembly output file." << std::endl;
-        return 1;
-    }
-
+    // parsed code
     std::string code((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-
-    compiler.compile(code, input_file, assemblyfile);
     
-    assemblyfile.close();
+    // llvm module file
+    llvm::LLVMContext context;
+    llvm::Module module("BF_module", context);
 
-    llvm_apis();
+    Compiler compiler;
+    compiler.lower_to_llvm(code, input_file, module, context);
+
+    post_instr_lowering(module, context);
     return 0;
 }
