@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <algorithm>
 #include <map>
+#include <stack>
 // LLVM headers
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
@@ -125,6 +126,9 @@ public:
     // from now on tape_ptr is the important.
     // tape_ptr is the pointer to the current memory location which is 0.    
 
+   // Stacks for loop handling
+    std::stack<llvm::BasicBlock*> loopStartStack;
+    std::stack<llvm::BasicBlock*> afterLoopStack;
 
         for (int PC_index = 0; PC_index < preprocessed.size(); ++PC_index) {
             char instruction = preprocessed[PC_index];
@@ -165,7 +169,6 @@ public:
                     // Output the current cell value using putchar
                     llvm::Value *currentTapePointer = builder.CreateLoad(builder.getInt8Ty()->getPointerTo(), tape_ptr, "load_tape_ptr");
                     llvm::Value *currentValue = builder.CreateLoad(builder.getInt8Ty(), currentTapePointer, "load_tape_value");
-
                     // Cast i8 to i32 since putchar expects an int argument
                     llvm::Value *currentValueAsInt32 = builder.CreateSExt(currentValue, builder.getInt32Ty(), "sext_value");
                     builder.CreateCall(putcharFunc, currentValueAsInt32);
@@ -174,65 +177,51 @@ public:
                 case ',': {
                     // Read a character using getchar and store it in the current cell
                     llvm::Value *currentTapePointer = builder.CreateLoad(builder.getInt8Ty()->getPointerTo(), tape_ptr, "load_tape_ptr");
-
                     // Call getchar and store the result in the current tape cell
                     llvm::Value *inputChar = builder.CreateCall(getcharFunc, {}, "input_char");
-
                     // Truncate i32 to i8 to store in the tape
                     llvm::Value *inputCharAsInt8 = builder.CreateTrunc(inputChar, builder.getInt8Ty(), "trunc_input");
                     builder.CreateStore(inputCharAsInt8, currentTapePointer);
                 } break;
-                // case '[':
-                // {
-                //     llvm::BasicBlock* loopStart = loop_bb_label[PC_index];
-                //     llvm::BasicBlock* loopEnd = loop_bb_label[PC_index + 1];  // assuming it matches ']'
-                    
-                //     llvm::Value* equalToZero = builder.CreateICmpEQ(builder.CreateLoad(builder.getInt8Ty(), builder.CreateLoad(builder.getInt8Ty()->getPointerTo(), tape_ptr, "load_tape_ptr"), "load_tape_value"),builder.getInt8(0), "zeroCheck");
-                //     builder.CreateCondBr(equalToZero, loopEnd, loopStart);  // Loop end if zero
-                //     builder.SetInsertPoint(loopStart);
-                // }
-                // break;
-                // case ']':
-                // {
-                //     llvm::BasicBlock* loopStart = loop_bb_label[PC_index];
-                //     llvm::BasicBlock* loopEnd = loop_bb_label[PC_index + 1];  // assuming it matches ']'
-                //     // load value from tape pointer
+                case '[':
+                {
 
-                //     // pass value to compare 
-                //     llvm::Value* notEqualToZero = builder.CreateICmpNE(builder.CreateLoad(builder.getInt8Ty(), builder.CreateLoad(builder.getInt8Ty()->getPointerTo(), tape_ptr, "load_tape_ptr"), "load_tape_value"),builder.getInt8(0), "CheckNotZero");
-                //     // create BB
-                //     builder.CreateCondBr(notEqualToZero, loopStart, loopEnd);  // Loop end if zero
-                //     builder.SetInsertPoint(loopEnd);
-                // }
+                    llvm::BasicBlock *loopStart = llvm::BasicBlock::Create(context, "loop_start", MainFunc);
+                    llvm::BasicBlock *loopEnd = llvm::BasicBlock::Create(context, "loop_end", MainFunc);
 
-        //         case '[':
-        //                 {
-        //                     llvm::BasicBlock* loopStart = loop_bb_label[PC_index];
-        //                     llvm::BasicBlock* loopEnd = loop_bb_label[PC_index + 1];  // assuming it matches ']'
-                            
-        //                     llvm::Value* equalToZero = builder.CreateICmpEQ(builder.CreateLoad(/*pointer to memory*/),llvm::ConstantInt::get(context, llvm::APInt(8, 0)), "zeroCheck");
-        //                     builder.CreateCondBr(equalToZero, loopEnd, loopStart);  // Loop end if zero
-        //                     builder.SetInsertPoint(loopStart);
-        //                 }
-        //         break;
-        //         case ']':
-        //         {
-        //                     llvm::BasicBlock* loopStart = loop_bb_label[PC_index];
-        //                     llvm::BasicBlock* loopEnd = loop_bb_label[PC_index + 1];  // assuming it matches ']'
-        //                     // load value from tape pointer
+                    // Push loop start and end blocks onto stacks
+                    loopStartStack.push(loopStart);
+                    afterLoopStack.push(loopEnd);
 
-        //                     // pass value to compare 
-        //                     llvm::Value* notEqualToZero = builder.CreateICmpNE(builder.CreateLoad(/*pointer to memory*/),llvm::ConstantInt::get(context, llvm::APInt(8, 0)), "CheckNotZero");
-        //                     // create BB
-        //                     builder.CreateCondBr(notEqualToZero, loopStart, loopEnd);  // Loop end if zero
-        //                     builder.SetInsertPoint(loopEnd);
-        //         }
-        //             break;
-        //     //     default:
-        //     //         std::cerr << "Failed to compile code from file=" << filename
-        //     //                   << ", at position = " << PC_index
-        //     //                   << ": and at instruction = '" << instruction << "'" << std::endl;
-        //     //         exit(1);
+                    llvm::Value* equalToZero = builder.CreateICmpEQ(builder.CreateLoad(builder.getInt8Ty(), builder.CreateLoad(builder.getInt8Ty()->getPointerTo(), tape_ptr, "load_tape_ptr"), "load_tape_value"),builder.getInt8(0), "zeroCheck");
+                    builder.CreateCondBr(equalToZero, loopEnd, loopStart);  // Loop end if zero
+                    builder.SetInsertPoint(loopStart);
+                }
+                break;
+                case ']':
+                {
+
+                    if (loopStartStack.empty() || afterLoopStack.empty()) {
+                        std::cerr << "Error: unmatched ']' in Brainfuck code" << std::endl;
+                        return;
+                    }
+
+                    llvm::BasicBlock *loopStart = loopStartStack.top();
+                    llvm::BasicBlock *loopEnd = afterLoopStack.top();
+                    loopStartStack.pop();
+                    afterLoopStack.pop();
+
+
+                    llvm::Value* notEqualToZero = builder.CreateICmpNE(builder.CreateLoad(builder.getInt8Ty(), builder.CreateLoad(builder.getInt8Ty()->getPointerTo(), tape_ptr, "load_tape_ptr"), "load_tape_value"),builder.getInt8(0), "zeroCheck");
+                    builder.CreateCondBr(notEqualToZero, loopStart, loopEnd);  // Loop end if zero
+                    builder.SetInsertPoint(loopEnd);
+                }
+                break;
+                default:
+                    std::cerr << "Failed to compile code from "
+                              << ", at position = " << PC_index
+                              << ": and at instruction = '" << instruction << "'" << std::endl;
+                    exit(1);
             }
         }
     }
@@ -272,11 +261,6 @@ public:
         preprocess(code);
         // createPrintTesting(module, context);
         createMainFunction(module, context);
-
-        // gen_assembly(assembly_file, filename);
-        // if (retval == true) {
-            // std::cout << "\nSuccessfully compiled code from file=" << filename << std::endl;
-        //  }
     }
 };
 
@@ -295,6 +279,8 @@ void post_instr_lowering(llvm::Module& module, llvm::LLVMContext& context) {
     assert(!res);
 
     // TODO: optimize
+    // ADD new pass manager
+    
 
     // Write the module to output.ll
     std::error_code EC;

@@ -19,12 +19,11 @@ run_benchmark() {
     ./aot_llvm $file
     llc -march=x86-64 output.ll -o output.s
     gcc output.s -o out
-    ./out
     { time ./out ; } 2>> $result_file
     echo "" >> $result_file
 }
 
 mkdir -p ../timing_results_llvm
-for file in ../benches/hello.b; do
+for file in ../benches/*.b; do
     run_benchmark $file "" "../timing_results_llvm/all_results_llvm_baseline.time"
 done
