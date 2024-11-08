@@ -104,62 +104,98 @@ public:
 
     void gen_llvm(llvm::Module& module, llvm::LLVMContext& context, llvm::IRBuilder<>& builder, llvm::Function* MainFunc) {
 
+    // tape allocation
+    llvm::ArrayType *tape_type = llvm::ArrayType::get(builder.getInt8Ty(), 30000);
+    llvm::Value *tape = builder.CreateAlloca(tape_type, nullptr, "tape");
+    // init with 0 all values as CreateAlloca doesn't initialize
+    builder.CreateMemSet(tape, builder.getInt8(0), 30000, llvm::MaybeAlign(1));
+
+    // pointer to tape[0]
+    llvm::Value *ptr = builder.CreateInBoundsGEP(
+        tape_type, tape, {builder.getInt32(0), builder.getInt32(0)}, "ptr");
+    llvm::Value *tape_ptr = builder.CreateAlloca(
+        builder.getInt8Ty()->getPointerTo(), nullptr, "tape_ptr");
+    // point to 0th location of tape. 
+    builder.CreateStore(ptr, tape_ptr);
+
+    // from now on tape_ptr is the important.
+    // tape_ptr is the pointer to the current memory location which is 0.    
+
 
         for (int PC_index = 0; PC_index < preprocessed.size(); ++PC_index) {
             char instruction = preprocessed[PC_index];
             //
             switch (instruction) {
                 case '>':
-                // assembly_file << "\taddq $1, %r12\n";
-                std::string my_custom_string = "Found > \n";
-                llvm::Function* printTestingFunc = createPrintTesting(module, context, my_custom_string);
-                builder.CreateCall(printTestingFunc);
-                break;
-            //     case '<':
-            //         assembly_file << "\tsubq $1, %r12\n";
-            //         break;
-            //     case '+':
-            //         assembly_file << "\taddb $1, (%r12)\n";
-            //         break;
-            //     case '-':
-            //         assembly_file << "\tsubb $1, (%r12)\n";
-            //         break;
-            //     case '.':
-            //         assembly_file << "\tmovb (%r12), %al\n";
-            //         assembly_file << "\tmovzbl %al, %edi\n";
-            //         assembly_file << "\tcall putchar\n";
-            //         break;
-            //     case ',':
-            //         assembly_file << "\tcall getchar\n";
-            //         assembly_file << "\tmovb %al, (%r12)\n";
-            //         break;
-                case '[':
-                        {
-                            llvm::BasicBlock* loopStart = loop_bb_label[PC_index];
-                            llvm::BasicBlock* loopEnd = loop_bb_label[PC_index + 1];  // assuming it matches ']'
-                            
-                            llvm::Value* equalToZero = builder.CreateICmpEQ(builder.CreateLoad(/*pointer to memory*/),llvm::ConstantInt::get(context, llvm::APInt(8, 0)), "zeroCheck");
-                            builder.CreateCondBr(equalToZero, loopEnd, loopStart);  // Loop end if zero
-                            builder.SetInsertPoint(loopStart);
-                        }
-                break;
-                case ']':
                 {
-                            llvm::BasicBlock* loopStart = loop_bb_label[PC_index];
-                            llvm::BasicBlock* loopEnd = loop_bb_label[PC_index + 1];  // assuming it matches ']'
-                            // load value from tape pointer
-                            // pass value to compare 
-                            llvm::Value* notEqualToZero = builder.CreateICmpNE(builder.CreateLoad(/*pointer to memory*/),llvm::ConstantInt::get(context, llvm::APInt(8, 0)), "CheckNotZero");
-                            // create BB
-                            builder.CreateCondBr(notEqualToZero, loopStart, loopEnd);  // Loop end if zero
-                            builder.SetInsertPoint(loopEnd);
+                    llvm::Value *currentTapePointer = builder.CreateLoad(builder.getInt8Ty()->getPointerTo(), tape_ptr, "load_tape_ptr");
+                    llvm::Value *newTapePointer = builder.CreateInBoundsGEP(builder.getInt8Ty(), currentTapePointer, builder.getInt32(1), "inc_tape_ptr");
+                    builder.CreateStore(newTapePointer, tape_ptr);
                 }
-                    break;
-            //     default:
-            //         std::cerr << "Failed to compile code from file=" << filename
-            //                   << ", at position = " << PC_index
-            //                   << ": and at instruction = '" << instruction << "'" << std::endl;
-            //         exit(1);
+                break;
+                case '<':
+                {
+                    llvm::Value *currentTapePointer = builder.CreateLoad(builder.getInt8Ty()->getPointerTo(), tape_ptr, "load_tape_ptr");
+                    llvm::Value *newTapePointer = builder.CreateInBoundsGEP(builder.getInt8Ty(), currentTapePointer, builder.getInt32(-1), "dec_tape_ptr");
+                    builder.CreateStore(newTapePointer, tape_ptr);
+                }
+                break;
+                case '+':
+                {
+                    llvm::Value *currentTapePointer = builder.CreateLoad(builder.getInt8Ty()->getPointerTo(), tape_ptr, "load_tape_ptr");
+                    llvm::Value *currentValue = builder.CreateLoad(builder.getInt8Ty(), currentTapePointer, "load_tape_value");
+                    llvm::Value *newValue = builder.CreateAdd(currentValue, builder.getInt8(1), "inc_tape_value");
+                    builder.CreateStore(newValue, currentTapePointer);
+                }
+                break;
+                case '-':
+                {
+                    llvm::Value *currentTapePointer = builder.CreateLoad(builder.getInt8Ty()->getPointerTo(), tape_ptr, "load_tape_ptr");
+                    llvm::Value *currentValue = builder.CreateLoad(builder.getInt8Ty(), currentTapePointer, "load_tape_value");
+                    llvm::Value *newValue = builder.CreateSub(currentValue, builder.getInt8(1), "dec_tape_value");
+                    builder.CreateStore(newValue, currentTapePointer);
+                }
+                break;
+                
+
+                
+        //     //     case '.':
+        //     //         assembly_file << "\tmovb (%r12), %al\n";
+        //     //         assembly_file << "\tmovzbl %al, %edi\n";
+        //     //         assembly_file << "\tcall putchar\n";
+        //     //         break;
+        //     //     case ',':
+        //     //         assembly_file << "\tcall getchar\n";
+        //     //         assembly_file << "\tmovb %al, (%r12)\n";
+        //     //         break;
+        //         case '[':
+        //                 {
+        //                     llvm::BasicBlock* loopStart = loop_bb_label[PC_index];
+        //                     llvm::BasicBlock* loopEnd = loop_bb_label[PC_index + 1];  // assuming it matches ']'
+                            
+        //                     llvm::Value* equalToZero = builder.CreateICmpEQ(builder.CreateLoad(/*pointer to memory*/),llvm::ConstantInt::get(context, llvm::APInt(8, 0)), "zeroCheck");
+        //                     builder.CreateCondBr(equalToZero, loopEnd, loopStart);  // Loop end if zero
+        //                     builder.SetInsertPoint(loopStart);
+        //                 }
+        //         break;
+        //         case ']':
+        //         {
+        //                     llvm::BasicBlock* loopStart = loop_bb_label[PC_index];
+        //                     llvm::BasicBlock* loopEnd = loop_bb_label[PC_index + 1];  // assuming it matches ']'
+        //                     // load value from tape pointer
+
+        //                     // pass value to compare 
+        //                     llvm::Value* notEqualToZero = builder.CreateICmpNE(builder.CreateLoad(/*pointer to memory*/),llvm::ConstantInt::get(context, llvm::APInt(8, 0)), "CheckNotZero");
+        //                     // create BB
+        //                     builder.CreateCondBr(notEqualToZero, loopStart, loopEnd);  // Loop end if zero
+        //                     builder.SetInsertPoint(loopEnd);
+        //         }
+        //             break;
+        //     //     default:
+        //     //         std::cerr << "Failed to compile code from file=" << filename
+        //     //                   << ", at position = " << PC_index
+        //     //                   << ": and at instruction = '" << instruction << "'" << std::endl;
+        //     //         exit(1);
             }
         }
     }
@@ -178,7 +214,7 @@ public:
         // builder.CreateCall(printTestingFunc);
 
         // iterate on all instructions
-        assign_loop_label(module, context, mainFunc);
+        // assign_loop_label(module, context, mainFunc);
         gen_llvm(module, context, builder, mainFunc);
 
         // Return a simple integer from main
