@@ -17,6 +17,6 @@ add_definitions(${LLVM_DEFINITIONS_LIST})
 add_executable(aot_llvm aot_llvm.cpp)
 
 # Link the required LLVM components
-llvm_map_components_to_libnames(llvm_libs Core Support x86asmparser x86codegen)  #passes irreader
+llvm_map_components_to_libnames(llvm_libs Core Support x86asmparser x86codegen passes)  #passes irreader
 target_link_libraries(aot_llvm ${llvm_libs})
 

@@ -24,6 +24,9 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
 #include <llvm/Support/raw_ostream.h>
+#include <llvm/Transforms/IPO/PassManagerBuilder.h>
+#include <llvm/IR/PassManager.h>
+#include <llvm/IR/LegacyPassManager.h>
 // #include <llvm/Target/TargetOptions.h>
 // #include <llvm/Target/TargetMachine.h>
 // #include <llvm/MC/TargetRegistry.h>
@@ -32,26 +35,6 @@
 class Compiler {
 private:
     std::vector<char> preprocessed;
-    std::unordered_map<int, std::string> loop_labels;
-    std::unordered_map<int, llvm::BasicBlock*> loop_bb_label;  // index, basic block
-
-    bool is_simple_loop(size_t start, size_t end) { // [...] contains brackets
-        std::unordered_map<int, int> offset_count;
-        int pointer_movement = 0;
-        int net_change = 0;
-        for (size_t i = start + 1; i < end; ++i) {  // body of loop
-            char command = preprocessed[i];
-            switch (command) {
-                case '>': pointer_movement++; break;
-                  case '<': pointer_movement--; break;
-                case '+': offset_count[pointer_movement]++; break;
-                case '-': offset_count[pointer_movement]--; break;
-                // if [+$] or even [+0] this is not a simple loop
-                case '[': case ']': case '.': case ',': case '$': case '0': return false; // Nested loops or I/O
-            }
-        }
-        return pointer_movement == 0 && (offset_count[0] == 1 || offset_count[0] == -1);
-    }
 
 public:
     Compiler(){}
@@ -76,31 +59,6 @@ public:
         builder.CreateRetVoid();
 
         return printTestingFunc;
-    }
-
-    void assign_loop_label(llvm::Module& module, llvm::LLVMContext& context, llvm::Function* MainFunc) {
-        std::vector<int> stack;
-        for (size_t idx = 0; idx < preprocessed.size(); ++idx) {
-            char command = preprocessed[idx];
-            if (command == '[') {
-                stack.push_back(idx);
-            } else if (command == ']') {
-                if (stack.empty()) {
-                    throw std::runtime_error("Unmatched ']' found");
-                }
-                int start = stack.back();
-                stack.pop_back();
-
-                llvm::BasicBlock *loopStart = llvm::BasicBlock::Create(context, "loop_start" + std::to_string(start), MainFunc);
-                llvm::BasicBlock *loopEnd = llvm::BasicBlock::Create(context, "loop_end" + std::to_string(start), MainFunc);
-
-                loop_bb_label[start] = loopStart;
-                loop_bb_label[idx] = loopEnd;
-            }
-        }
-        if (!stack.empty()) {
-            throw std::runtime_error("Unmatched '[' found");
-        }
     }
 
     void gen_llvm(llvm::Module& module, llvm::LLVMContext& context, llvm::IRBuilder<>& builder, llvm::Function* MainFunc) {
@@ -274,7 +232,17 @@ void post_instr_lowering(llvm::Module& module, llvm::LLVMContext& context) {
 
     // TODO: optimize
     // ADD new pass manager
-    
+
+    // Create a pass manager to run optimization passes
+    llvm::legacy::FunctionPassManager FpassManager(&module);
+    llvm::legacy::PassManager passManager;
+
+    // Use PassManagerBuilder to apply optimization flags like -O2 or -O3
+    llvm::PassManagerBuilder passManagerBuilder;
+    passManagerBuilder.OptLevel = 0;  // Set the optimization level to 3 (i.e., -O3)
+    passManagerBuilder.populateFunctionPassManager(FpassManager);
+    passManagerBuilder.populateModulePassManager(passManager);
+    passManager.run(module);
 
     // Write the module to output.ll
     std::error_code EC;
