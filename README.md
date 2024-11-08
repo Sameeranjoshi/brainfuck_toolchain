@@ -71,3 +71,33 @@ clang++ -std=c++17 -O3 -o compiler compiler_x86_64.cpp
 ./compiler <input_file> [--optimize-simple-loops] [--optimize-memory-scans]
 ```
 
+
+### Brainfunk to LLVM
+
+Run the compiler:
+
+1. Generates the LLVM `output.ll` file from BF code.
+2. runs llc
+3. Links with C library using `gcc`
+4. Executes the binary
+
+Note: This command will also run AOT compiler for benchmarking and store results in `timing_results_llvm`
+```bash
+bash runllvm.sh
+```
+
+To manually build and run a single test:
+
+```bash
+mkdir -p build
+cd build
+cmake -DLLVM_DIR=/usr/lib64/cmake/llvm/ -G Ninja ..
+ninja
+
+./aot_llvm ../benches/hello.b
+llc -march=x86-64 output.ll -o output.s
+gcc output.s -o out
+
+./out
+```
+
