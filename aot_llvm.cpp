@@ -118,6 +118,10 @@ public:
     // point to 0th location of tape. 
     builder.CreateStore(ptr, tape_ptr);
 
+    // Declare external functions
+    llvm::FunctionCallee putcharFunc = module.getOrInsertFunction("putchar", builder.getInt32Ty(), builder.getInt32Ty());
+    llvm::FunctionCallee getcharFunc = module.getOrInsertFunction("getchar", builder.getInt32Ty());
+
     // from now on tape_ptr is the important.
     // tape_ptr is the pointer to the current memory location which is 0.    
 
@@ -157,17 +161,50 @@ public:
                 }
                 break;
                 
+                case '.': {
+                    // Output the current cell value using putchar
+                    llvm::Value *currentTapePointer = builder.CreateLoad(builder.getInt8Ty()->getPointerTo(), tape_ptr, "load_tape_ptr");
+                    llvm::Value *currentValue = builder.CreateLoad(builder.getInt8Ty(), currentTapePointer, "load_tape_value");
 
-                
-        //     //     case '.':
-        //     //         assembly_file << "\tmovb (%r12), %al\n";
-        //     //         assembly_file << "\tmovzbl %al, %edi\n";
-        //     //         assembly_file << "\tcall putchar\n";
-        //     //         break;
-        //     //     case ',':
-        //     //         assembly_file << "\tcall getchar\n";
-        //     //         assembly_file << "\tmovb %al, (%r12)\n";
-        //     //         break;
+                    // Cast i8 to i32 since putchar expects an int argument
+                    llvm::Value *currentValueAsInt32 = builder.CreateSExt(currentValue, builder.getInt32Ty(), "sext_value");
+                    builder.CreateCall(putcharFunc, currentValueAsInt32);
+                } break;
+
+                case ',': {
+                    // Read a character using getchar and store it in the current cell
+                    llvm::Value *currentTapePointer = builder.CreateLoad(builder.getInt8Ty()->getPointerTo(), tape_ptr, "load_tape_ptr");
+
+                    // Call getchar and store the result in the current tape cell
+                    llvm::Value *inputChar = builder.CreateCall(getcharFunc, {}, "input_char");
+
+                    // Truncate i32 to i8 to store in the tape
+                    llvm::Value *inputCharAsInt8 = builder.CreateTrunc(inputChar, builder.getInt8Ty(), "trunc_input");
+                    builder.CreateStore(inputCharAsInt8, currentTapePointer);
+                } break;
+                // case '[':
+                // {
+                //     llvm::BasicBlock* loopStart = loop_bb_label[PC_index];
+                //     llvm::BasicBlock* loopEnd = loop_bb_label[PC_index + 1];  // assuming it matches ']'
+                    
+                //     llvm::Value* equalToZero = builder.CreateICmpEQ(builder.CreateLoad(builder.getInt8Ty(), builder.CreateLoad(builder.getInt8Ty()->getPointerTo(), tape_ptr, "load_tape_ptr"), "load_tape_value"),builder.getInt8(0), "zeroCheck");
+                //     builder.CreateCondBr(equalToZero, loopEnd, loopStart);  // Loop end if zero
+                //     builder.SetInsertPoint(loopStart);
+                // }
+                // break;
+                // case ']':
+                // {
+                //     llvm::BasicBlock* loopStart = loop_bb_label[PC_index];
+                //     llvm::BasicBlock* loopEnd = loop_bb_label[PC_index + 1];  // assuming it matches ']'
+                //     // load value from tape pointer
+
+                //     // pass value to compare 
+                //     llvm::Value* notEqualToZero = builder.CreateICmpNE(builder.CreateLoad(builder.getInt8Ty(), builder.CreateLoad(builder.getInt8Ty()->getPointerTo(), tape_ptr, "load_tape_ptr"), "load_tape_value"),builder.getInt8(0), "CheckNotZero");
+                //     // create BB
+                //     builder.CreateCondBr(notEqualToZero, loopStart, loopEnd);  // Loop end if zero
+                //     builder.SetInsertPoint(loopEnd);
+                // }
+
         //         case '[':
         //                 {
         //                     llvm::BasicBlock* loopStart = loop_bb_label[PC_index];
