@@ -28,11 +28,11 @@
 // #include <llvm/MC/TargetRegistry.h>
 
 
-
 class Compiler {
 private:
     std::vector<char> preprocessed;
     std::unordered_map<int, std::string> loop_labels;
+    std::unordered_map<int, llvm::BasicBlock*> loop_bb_label;  // index, basic block
 
     bool is_simple_loop(size_t start, size_t end) { // [...] contains brackets
         std::unordered_map<int, int> offset_count;
@@ -55,7 +55,29 @@ private:
 public:
     Compiler(){}
 
-    void assign_loop_label() {
+    llvm::Function* createPrintTesting(llvm::Module& module, llvm::LLVMContext& context, std::string &my_custom_string) {
+        // Define the `printTesting` function signature
+        llvm::FunctionType* printTestingType = llvm::FunctionType::get(llvm::Type::getVoidTy(context), {}, false);
+        llvm::Function* printTestingFunc = llvm::Function::Create(printTestingType, llvm::Function::ExternalLinkage, "printTesting", module);
+
+        // Create a new basic block for printTesting
+        llvm::BasicBlock* entry = llvm::BasicBlock::Create(context, "entry", printTestingFunc);
+        llvm::IRBuilder<> builder(entry);
+
+        // Create a global string constant for "Testing LLVM\n"
+        llvm::Value* testingStr = builder.CreateGlobalStringPtr(my_custom_string);
+        // Call `printf` with the string as the argument
+        llvm::FunctionType* printfType = llvm::FunctionType::get(llvm::Type::getInt32Ty(context), {llvm::Type::getInt8PtrTy(context)}, true);
+        llvm::FunctionCallee printfFunc = module.getOrInsertFunction("printf", printfType);
+        builder.CreateCall(printfFunc, {testingStr});
+
+        // Return from the function
+        builder.CreateRetVoid();
+
+        return printTestingFunc;
+    }
+
+    void assign_loop_label(llvm::Module& module, llvm::LLVMContext& context, llvm::Function* MainFunc) {
         std::vector<int> stack;
         for (size_t idx = 0; idx < preprocessed.size(); ++idx) {
             char command = preprocessed[idx];
@@ -67,8 +89,12 @@ public:
                 }
                 int start = stack.back();
                 stack.pop_back();
-                loop_labels[start] = ".L" + std::to_string(start);
-                loop_labels[idx] = ".L" + std::to_string(start);
+
+                llvm::BasicBlock *loopStart = llvm::BasicBlock::Create(context, "loop_start" + std::to_string(start), MainFunc);
+                llvm::BasicBlock *loopEnd = llvm::BasicBlock::Create(context, "loop_end" + std::to_string(start), MainFunc);
+
+                loop_bb_label[start] = loopStart;
+                loop_bb_label[idx] = loopEnd;
             }
         }
         if (!stack.empty()) {
@@ -76,141 +102,84 @@ public:
         }
     }
 
-    void final_setup_assembly_structute(std::ofstream &assembly_file) {
-        // Restore registers
-        assembly_file << "\n\n\n# Epilogue\n";
-        assembly_file << "\tpopq %r12                 # Restore r12\n";
-        assembly_file << "\tpopq %rbx                 # Restore rbx\n";
-        assembly_file << "\tmovq %rbp, %rsp           # Restore stack pointer\n";
-        assembly_file << "\tpopq %rbp                 # Restore base pointer\n";
-        assembly_file << "\tret                       # Return to the kernel\n";
-    }
+    void gen_llvm(llvm::Module& module, llvm::LLVMContext& context, llvm::IRBuilder<>& builder, llvm::Function* MainFunc) {
 
-    void initial_setup_assembly_structure(std::ofstream &assembly_file) {
-        // Text section
-        assembly_file << ".section .text\n";
-        assembly_file << ".globl main\n\n";
-
-        assembly_file << "main:\n";
-
-        assembly_file << "\t.extern malloc\n";
-        assembly_file << "\t.extern memset\n";
-        assembly_file << "\t.extern putchar\n";
-
-        // Save frame pointer and link register onto stack
-        assembly_file << "# Prologue\n";
-        assembly_file << "\tpushq %rbp                # Save the base pointer\n";
-        assembly_file << "\tmovq %rsp, %rbp          # Set base pointer to stack pointer\n";
-
-        // Save rbx and r12 (used as general-purpose registers)
-        assembly_file << "\tpushq %rbx                # Save rbx\n";
-        assembly_file << "\tpushq %r12                # Save r12\n";
-
-        // Allocate data array using malloc
-        assembly_file << "# Memory allocation call\n";
-        assembly_file << "\tmovq $30000, %rdi         # Allocate 30,000 bytes\n";
-        assembly_file << "\tcall malloc                # Call malloc function\n";
-
-        // Store data pointer for tape in r12
-        assembly_file << "# Save the return pointer\n";
-        assembly_file << "\tmovq %rax, %r12           # Store returned pointer in r12\n";
-        // Store original pointer allocated in rbx
-        assembly_file << "\tmovq %rax, %rbx           # Store original pointer in rbx\n";
-
-        // zero the tape
-        assembly_file << "# Zero out the allocated memory\n";
-        assembly_file << "\tmovq %r12, %rdi           # Destination pointer\n";
-        assembly_file << "\tmovq $0, %rsi              # Value to set (zero)\n";
-        assembly_file << "\tmovq $30000, %rdx         # Number of bytes\n";
-        assembly_file << "\tcall memset                # Call memset function\n";
-    }
-
-    void gen_assembly(std::ofstream &assembly_file, const std::string& filename) {
 
         for (int PC_index = 0; PC_index < preprocessed.size(); ++PC_index) {
             char instruction = preprocessed[PC_index];
-
+            //
             switch (instruction) {
                 case '>':
-                    assembly_file << "\taddq $1, %r12\n";
-                    break;
-                case '<':
-                    assembly_file << "\tsubq $1, %r12\n";
-                    break;
-                case '+':
-                    assembly_file << "\taddb $1, (%r12)\n";
-                    break;
-                case '-':
-                    assembly_file << "\tsubb $1, (%r12)\n";
-                    break;
-                case '.':
-                    assembly_file << "\tmovb (%r12), %al\n";
-                    assembly_file << "\tmovzbl %al, %edi\n";
-                    assembly_file << "\tcall putchar\n";
-                    break;
-                case ',':
-                    assembly_file << "\tcall getchar\n";
-                    assembly_file << "\tmovb %al, (%r12)\n";
-                    break;
+                // assembly_file << "\taddq $1, %r12\n";
+                std::string my_custom_string = "Found > \n";
+                llvm::Function* printTestingFunc = createPrintTesting(module, context, my_custom_string);
+                builder.CreateCall(printTestingFunc);
+                break;
+            //     case '<':
+            //         assembly_file << "\tsubq $1, %r12\n";
+            //         break;
+            //     case '+':
+            //         assembly_file << "\taddb $1, (%r12)\n";
+            //         break;
+            //     case '-':
+            //         assembly_file << "\tsubb $1, (%r12)\n";
+            //         break;
+            //     case '.':
+            //         assembly_file << "\tmovb (%r12), %al\n";
+            //         assembly_file << "\tmovzbl %al, %edi\n";
+            //         assembly_file << "\tcall putchar\n";
+            //         break;
+            //     case ',':
+            //         assembly_file << "\tcall getchar\n";
+            //         assembly_file << "\tmovb %al, (%r12)\n";
+            //         break;
                 case '[':
-                    assembly_file << "#LOOP \n";
-                    assembly_file << loop_labels[PC_index] + "_start" << ":\n";
-                    assembly_file << "\tcmpb $0, (%r12)\n";
-                    assembly_file << "\tje " << loop_labels[PC_index] + "_end\n\n";
-                    break;
+                        {
+                            llvm::BasicBlock* loopStart = loop_bb_label[PC_index];
+                            llvm::BasicBlock* loopEnd = loop_bb_label[PC_index + 1];  // assuming it matches ']'
+                            
+                            llvm::Value* equalToZero = builder.CreateICmpEQ(builder.CreateLoad(/*pointer to memory*/),llvm::ConstantInt::get(context, llvm::APInt(8, 0)), "zeroCheck");
+                            builder.CreateCondBr(equalToZero, loopEnd, loopStart);  // Loop end if zero
+                            builder.SetInsertPoint(loopStart);
+                        }
+                break;
                 case ']':
-                    assembly_file << "\n\tjmp " << loop_labels[PC_index] + "_start" << "\n";
-                    assembly_file << loop_labels[PC_index] + "_end" << ":\n";
-                    assembly_file << "#LOOP END\n";
+                {
+                            llvm::BasicBlock* loopStart = loop_bb_label[PC_index];
+                            llvm::BasicBlock* loopEnd = loop_bb_label[PC_index + 1];  // assuming it matches ']'
+                            // load value from tape pointer
+                            // pass value to compare 
+                            llvm::Value* notEqualToZero = builder.CreateICmpNE(builder.CreateLoad(/*pointer to memory*/),llvm::ConstantInt::get(context, llvm::APInt(8, 0)), "CheckNotZero");
+                            // create BB
+                            builder.CreateCondBr(notEqualToZero, loopStart, loopEnd);  // Loop end if zero
+                            builder.SetInsertPoint(loopEnd);
+                }
                     break;
-                default:
-                    std::cerr << "Failed to compile code from file=" << filename
-                              << ", at position = " << PC_index
-                              << ": and at instruction = '" << instruction << "'" << std::endl;
-                    exit(1);
+            //     default:
+            //         std::cerr << "Failed to compile code from file=" << filename
+            //                   << ", at position = " << PC_index
+            //                   << ": and at instruction = '" << instruction << "'" << std::endl;
+            //         exit(1);
             }
         }
-    }
-
-    llvm::Function* createPrintTesting(llvm::Module& module, llvm::LLVMContext& context) {
-        // Define the `printTesting` function signature
-        llvm::FunctionType* printTestingType = llvm::FunctionType::get(
-            llvm::Type::getVoidTy(context), {}, false);
-        llvm::Function* printTestingFunc = llvm::Function::Create(
-            printTestingType, llvm::Function::ExternalLinkage, "printTesting", module);
-
-        // Create a new basic block for printTesting
-        llvm::BasicBlock* entry = llvm::BasicBlock::Create(context, "entry", printTestingFunc);
-        llvm::IRBuilder<> builder(entry);
-
-        // Create a global string constant for "Testing LLVM\n"
-        llvm::Value* testingStr = builder.CreateGlobalStringPtr("Testing LLVM\n");
-        // Call `printf` with the string as the argument
-        llvm::FunctionType* printfType = llvm::FunctionType::get(
-            llvm::Type::getInt32Ty(context), {llvm::Type::getInt8PtrTy(context)}, true);
-        llvm::FunctionCallee printfFunc = module.getOrInsertFunction("printf", printfType);
-        builder.CreateCall(printfFunc, {testingStr});
-
-        // Return from the function
-        builder.CreateRetVoid();
-
-        return printTestingFunc;
     }
     
     llvm::Function* createMainFunction(llvm::Module& module, llvm::LLVMContext& context) {
         // Define the `main` function signature
-        llvm::FunctionType* mainType = llvm::FunctionType::get(
-            llvm::Type::getInt32Ty(context), {}, false);
-        llvm::Function* mainFunc = llvm::Function::Create(
-            mainType, llvm::Function::ExternalLinkage, "main", module);
+        llvm::FunctionType* mainType = llvm::FunctionType::get(llvm::Type::getInt32Ty(context), {}, false);
+        llvm::Function* mainFunc = llvm::Function::Create(mainType, llvm::Function::ExternalLinkage, "main", module);
 
         // Create a new basic block for main
         llvm::BasicBlock* entry = llvm::BasicBlock::Create(context, "entry", mainFunc);
         llvm::IRBuilder<> builder(entry);
 
-        // Call printTesting function
-        llvm::Function* printTestingFunc = module.getFunction("printTesting");
-        builder.CreateCall(printTestingFunc);
+        // // Call printTesting function
+        // llvm::Function* printTestingFunc = module.getFunction("printTesting");
+        // builder.CreateCall(printTestingFunc);
+
+        // iterate on all instructions
+        assign_loop_label(module, context, mainFunc);
+        gen_llvm(module, context, builder, mainFunc);
 
         // Return a simple integer from main
         builder.CreateRet(llvm::ConstantInt::get(context, llvm::APInt(32, 0)));
@@ -228,15 +197,13 @@ public:
 
     void lower_to_llvm(const std::string& code, const std::string& filename, llvm::Module& module, llvm::LLVMContext& context) {
         preprocess(code);
-        createPrintTesting(module, context);
+        // createPrintTesting(module, context);
         createMainFunction(module, context);
-        
-        // assign_loop_label();
-        // initial_setup_assembly_structure(assembly_file);
-        // gen_assembly(assembly_file, filename);
-        // final_setup_assembly_structute(assembly_file);
 
-        // std::cout << "\nSuccessfully compiled code from file=" << filename << std::endl;
+        // gen_assembly(assembly_file, filename);
+        // if (retval == true) {
+            // std::cout << "\nSuccessfully compiled code from file=" << filename << std::endl;
+        //  }
     }
 };
 
@@ -250,7 +217,7 @@ void post_instr_lowering(llvm::Module& module, llvm::LLVMContext& context) {
     auto targetTriple = llvm::sys::getDefaultTargetTriple();
     module.setTargetTriple(targetTriple);
 
-    // verify module
+    // // verify module
     auto res = llvm::verifyModule(module, &llvm::errs());
     assert(!res);
 
