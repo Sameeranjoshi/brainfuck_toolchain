@@ -1,66 +1,66 @@
 Processing ../benches/bench.b 
 
-real	0m0.315s
-user	0m0.288s
-sys	0m0.002s
+real	0m0.347s
+user	0m0.339s
+sys	0m0.003s
 
 Processing ../benches/bottles.b 
 
-real	0m0.017s
-user	0m0.003s
-sys	0m0.007s
+real	0m0.016s
+user	0m0.008s
+sys	0m0.005s
 
 Processing ../benches/deadcodetest.b 
 
-real	0m0.008s
-user	0m0.001s
-sys	0m0.002s
+real	0m0.075s
+user	0m0.000s
+sys	0m0.004s
 
 Processing ../benches/hanoi.b 
 
-real	0m8.547s
-user	0m8.497s
-sys	0m0.003s
+real	0m9.678s
+user	0m9.576s
+sys	0m0.011s
 
 Processing ../benches/hello.b 
 
-real	0m0.027s
+real	0m0.003s
 user	0m0.000s
-sys	0m0.003s
+sys	0m0.002s
 
 Processing ../benches/long.b 
 
-real	0m5.833s
-user	0m5.786s
-sys	0m0.003s
+real	0m7.355s
+user	0m7.310s
+sys	0m0.005s
 
 Processing ../benches/loopremove.b 
 
-real	0m0.006s
+real	0m0.005s
 user	0m0.000s
 sys	0m0.003s
 
 Processing ../benches/mandel.b 
 
-real	0m3.944s
-user	0m3.893s
-sys	0m0.013s
+real	0m3.785s
+user	0m3.761s
+sys	0m0.003s
 
 Processing ../benches/serptri.b 
+
+real	0m0.005s
+user	0m0.001s
+sys	0m0.001s
+
+Processing ../benches/test.b 
+
+real	0m0.005s
+user	0m0.000s
+sys	0m0.003s
+
+Processing ../benches/twinkle.b 
 
 real	0m0.006s
 user	0m0.001s
 sys	0m0.003s
-
-Processing ../benches/test.b 
-
-real	0m0.007s
-user	0m0.001s
-sys	0m0.002s
-
-Processing ../benches/twinkle.b 
-
-real	0m0.008s
-user	0m0.000s
-sys	0m0.004s
 

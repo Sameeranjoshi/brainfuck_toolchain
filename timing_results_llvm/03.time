@@ -1,0 +1,66 @@
+Processing ../benches/bench.b 
+
+real	0m0.004s
+user	0m0.000s
+sys	0m0.002s
+
+Processing ../benches/bottles.b 
+
+real	0m0.005s
+user	0m0.000s
+sys	0m0.004s
+
+Processing ../benches/deadcodetest.b 
+
+real	0m0.003s
+user	0m0.000s
+sys	0m0.001s
+
+Processing ../benches/hanoi.b 
+
+real	0m0.010s
+user	0m0.003s
+sys	0m0.005s
+
+Processing ../benches/hello.b 
+
+real	0m0.004s
+user	0m0.000s
+sys	0m0.003s
+
+Processing ../benches/long.b 
+
+real	0m0.060s
+user	0m0.055s
+sys	0m0.003s
+
+Processing ../benches/loopremove.b 
+
+real	0m0.005s
+user	0m0.001s
+sys	0m0.003s
+
+Processing ../benches/mandel.b 
+
+real	0m1.169s
+user	0m1.159s
+sys	0m0.002s
+
+Processing ../benches/serptri.b 
+
+real	0m0.005s
+user	0m0.000s
+sys	0m0.004s
+
+Processing ../benches/test.b 
+
+real	0m0.011s
+user	0m0.000s
+sys	0m0.002s
+
+Processing ../benches/twinkle.b 
+
+real	0m0.005s
+user	0m0.000s
+sys	0m0.004s
+

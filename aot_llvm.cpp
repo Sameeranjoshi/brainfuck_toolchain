@@ -239,7 +239,7 @@ void post_instr_lowering(llvm::Module& module, llvm::LLVMContext& context) {
 
     // Use PassManagerBuilder to apply optimization flags like -O2 or -O3
     llvm::PassManagerBuilder passManagerBuilder;
-    passManagerBuilder.OptLevel = 0;  // Set the optimization level to 3 (i.e., -O3)
+    passManagerBuilder.OptLevel = 3;  // Set the optimization level to 3 (i.e., -O3)
     passManagerBuilder.populateFunctionPassManager(FpassManager);
     passManagerBuilder.populateModulePassManager(passManager);
     passManager.run(module);

@@ -1,0 +1,132 @@
+Processing benches/bench.b 
+
+real	0m0.285s
+user	0m0.279s
+sys	0m0.004s
+
+Processing benches/bottles.b 
+
+real	0m0.012s
+user	0m0.004s
+sys	0m0.006s
+
+Processing benches/deadcodetest.b 
+
+real	0m0.005s
+user	0m0.000s
+sys	0m0.003s
+
+Processing benches/hanoi.b 
+
+real	0m8.561s
+user	0m8.479s
+sys	0m0.023s
+
+Processing benches/hello.b 
+
+real	0m0.003s
+user	0m0.000s
+sys	0m0.001s
+
+Processing benches/long.b 
+
+real	0m5.866s
+user	0m5.775s
+sys	0m0.009s
+
+Processing benches/loopremove.b 
+
+real	0m0.004s
+user	0m0.001s
+sys	0m0.001s
+
+Processing benches/mandel.b 
+
+real	0m3.935s
+user	0m3.911s
+sys	0m0.004s
+
+Processing benches/serptri.b 
+
+real	0m0.005s
+user	0m0.000s
+sys	0m0.004s
+
+Processing benches/test.b 
+
+real	0m0.005s
+user	0m0.000s
+sys	0m0.003s
+
+Processing benches/twinkle.b 
+
+real	0m0.006s
+user	0m0.002s
+sys	0m0.001s
+
+Processing benches/bench.b 
+
+real	0m0.291s
+user	0m0.286s
+sys	0m0.002s
+
+Processing benches/bottles.b 
+
+real	0m0.010s
+user	0m0.007s
+sys	0m0.001s
+
+Processing benches/deadcodetest.b 
+
+real	0m0.005s
+user	0m0.000s
+sys	0m0.003s
+
+Processing benches/hanoi.b 
+
+real	0m8.606s
+user	0m8.483s
+sys	0m0.031s
+
+Processing benches/hello.b 
+
+real	0m0.005s
+user	0m0.001s
+sys	0m0.002s
+
+Processing benches/long.b 
+
+real	0m5.811s
+user	0m5.782s
+sys	0m0.002s
+
+Processing benches/loopremove.b 
+
+real	0m0.005s
+user	0m0.001s
+sys	0m0.002s
+
+Processing benches/mandel.b 
+
+real	0m3.953s
+user	0m3.902s
+sys	0m0.016s
+
+Processing benches/serptri.b 
+
+real	0m0.008s
+user	0m0.001s
+sys	0m0.003s
+
+Processing benches/test.b 
+
+real	0m0.009s
+user	0m0.000s
+sys	0m0.003s
+
+Processing benches/twinkle.b 
+
+real	0m0.006s
+user	0m0.000s
+sys	0m0.004s
+
