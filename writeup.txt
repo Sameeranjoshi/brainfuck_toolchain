@@ -1,0 +1,91 @@
+Summary:
+1. BF benchmarks - work for simple-loops, the hanoi.b, serptri.b fails with segfaults, I spend a lot of time figuring the error, I tried creduce no success. My debugging gives me conclusion that the segfault is somewhere caused by not handling the edge cases memory properly.
+2. Timings are added for all flags as mentioned.
+3. Testing:  bftests (I had to use Ctrl + C many times as they never stopped after like 30seconds, mostly failures are from same.)
+
+--optimize-simple-loops
+28 failures, 22 successes
+--optimize-memory-scans
+28 failures, 22 successes
+
+
+
+Details:
+1. Codegen workflow:
+
+Generic algorithm for both my compiler:
+              Preprocess()
+              optimize()
+              assign_loop_labels()
+              gen_assembly()
+
+
+2. Simple loops:(look for function name: optimize())
+       I look for loops traversing over the preprocessed code, the moment I find a loop I check for simple loop properties, if true I create a datastructure which captures the offset and count (I though of a generic formula so I do some bookkeeping in this datastructure). Then I replace the loop ([+] -> $00) start index with '$' and other instructions with '0'. And make a bookkeeping of the '$' -> 'map of offset and count'. 
+
+       During my assembly generation I replace the $ with corresponding map(offset, count) using some generic formula like below
+       p[offset] = p[offset] + count * base
+
+       In summary, I find simple loops and generate assembly for them using some bookkeeping, I see a decent speedup.
+
+
+3. Memory scans(look for function name: optimize())
+       if memory_scan properties are true, I find direction of scan, and then build assembly for the same and keep in a map(I don't print it yet), then same as above I replace the loop with a 'Z' as opposed to '$' from previous optimization, and later during assembly generation I replace the 'Z' with corresponding assembly.
+       The assembly seems to be doing something tricker with memory checks, as simple inputs like [>] or [>>] or [>>>>] are working well, something tricker in hanoi.b, serptri.b fails, I tried Creduce(output at the end) but it doesn't reduce the test.
+
+
+4. Positive Examples
+    Simple loop:
+    [+]
+    [->+>---<<]
+    < Screenshot >
+
+    Memory scans:
+    [<]
+    +++[>>>>]--
+    <screenshot>
+
+5. Negative examples:
+
+    Simple loops:
+    Nesting of loops
+    [+[+]]
+
+    Memory scans:
+    Again nesting here as well could be possible.
+    [>>[>>>>]] 
+
+6. Performance numbers:
+    The folder has 4 files 
+    https://github.com/Sameeranjoshi/brainfuck_toolchain/tree/main/timing_results/
+
+APPENDIX:
+
+################CREDUCE#########################
+
+sameeran@sameeran:~/classes/brainfuck_toolchain/tmp$ ls
+hanoi.b  out  runoptimizer.sh
+sameeran@sameeran:~/classes/brainfuck_toolchain/tmp$ creduce ./runoptimizer.sh hanoi.b 
+===< 349141 >===
+running 3 interestingness tests in parallel
+===< pass_unifdef :: 0 >===
+===< pass_comments :: 0 >===
+===< pass_ifs :: 0 >===
+===< pass_includes :: 0 >===
+===< pass_line_markers :: 0 >===
+===< pass_blank :: 0 >===
+===< pass_clang_binsrch :: replace-function-def-with-decl >===
+===< pass_clang_binsrch :: remove-unused-function >===
+===< pass_lines :: 0 >===
+(0.0 %, 54593 bytes)
+(100.0 %, 0 bytes)
+
+The file being reduced has reached zero size; our work here is done.
+
+If you did not want a zero size file, you must help C-Reduce out by
+making sure that your interestingness test does not find files like
+this to be interesting.
+
+sameeran@sameeran:~/classes/brainfuck_toolchain/tmp$ 
+
+
